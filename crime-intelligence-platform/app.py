@@ -26,7 +26,7 @@ from services.crime_officer import officer
 app = Flask(__name__)
 # The "*" acts as a wildcard, letting ANY frontend connect to it
 CORS(app, resources={r"/*": {"origins": "*"}})
-)
+
 
 # ==========================================================
 # Database Connection
