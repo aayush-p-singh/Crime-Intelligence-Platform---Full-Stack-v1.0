@@ -23,10 +23,17 @@ from services.crime_officer import officer
 # ==========================================================
 # Flask Initialization
 # ==========================================================
-app = Flask(__name__)
-# The "*" acts as a wildcard, letting ANY frontend connect to it
-CORS(app, resources={r"/*": {"origins": "*"}})
+from flask import Flask
+from flask_cors import CORS
 
+app = Flask(__name__)
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+
+# Allow all frontend origins
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # ==========================================================
 # Database Connection
