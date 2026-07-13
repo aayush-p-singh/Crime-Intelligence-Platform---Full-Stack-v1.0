@@ -48,6 +48,17 @@ export interface StateData {
   risk?: string;
 }
 
+export interface ForecastRequest {
+  Crime_Rate_2022: number;
+  Women_Crimes_2022: number;
+  Chargesheet_Rate_2022: number;
+}
+
+export interface ForecastResponse {
+  status: string;
+  forecasted_threat_level: string;
+}
+
 // The backend returns an array of StateData for the comparison endpoint
 
 
@@ -124,4 +135,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+// AI Forecasting
+  getThreatForecast: (data: ForecastRequest) => 
+    apiFetch<ForecastResponse>('/api/forecast', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),    
 };

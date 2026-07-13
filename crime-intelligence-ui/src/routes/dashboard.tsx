@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRef, useState, useMemo } from 'react';
 import { 
   ShieldAlert, TrendingUp, Users, AlertTriangle, 
-  Download, Loader2, FileText, MapPin
+  Download, Loader2, FileText, MapPin, BrainCircuit
 } from 'lucide-react';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
@@ -38,6 +38,7 @@ function DashboardComponent() {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState('All');
 
+  // 1. Fetch live map data
   const { data: rawStatesData, isLoading, error } = useQuery({
     queryKey: ['states-data'],
     queryFn: api.getMapData,
@@ -95,6 +96,8 @@ function DashboardComponent() {
   const totalIncidents = activeData.reduce((sum, state) => sum + state.totalCrime, 0);
   const totalWomenCrimes = activeData.reduce((sum, state) => sum + state.womenCrime, 0);
   const avgCrimeRate = activeData.length > 0 ? (activeData.reduce((sum, state) => sum + state.crimeRate, 0) / activeData.length).toFixed(1) : "0.0";
+  const avgChargesheet = activeData.length > 0 ? (activeData.reduce((sum, state) => sum + state.chargesheetRate, 0) / activeData.length).toFixed(1) : "0.0";
+  
   const top5CrimeStates = [...activeData].sort((a, b) => b.crimeRate - a.crimeRate).slice(0, 5);
   const bottom5Chargesheet = [...activeData].sort((a, b) => a.chargesheetRate - b.chargesheetRate).slice(0, 5);
   
@@ -105,6 +108,31 @@ function DashboardComponent() {
     }, {})
   ).map(([name, value]) => ({ name, value }));
 
+  // --- 2. AI FORECASTING ENGINE ---
+  const { data: forecastData, isLoading: isForecasting } = useQuery({
+    queryKey: ['threat-forecast', selectedRegion, activeData.length],
+    queryFn: async () => {
+      // Calculate inputs based on selection (Scale down national totals to state-averages for the model)
+      const inputCrimeRate = selectedRegion === 'All' ? parseFloat(avgCrimeRate) : activeData[0]?.crimeRate || 0;
+      const inputWomenCrime = selectedRegion === 'All' ? Math.round(totalWomenCrimes / activeData.length) : activeData[0]?.womenCrime || 0;
+      const inputChargesheet = selectedRegion === 'All' ? parseFloat(avgChargesheet) : activeData[0]?.chargesheetRate || 0;
+
+      return api.getThreatForecast({
+        Crime_Rate_2022: inputCrimeRate,
+        Women_Crimes_2022: inputWomenCrime,
+        Chargesheet_Rate_2022: inputChargesheet
+      });
+    },
+    enabled: activeData.length > 0, // Only run when we have data
+  });
+
+  const threatLevel = forecastData?.forecasted_threat_level?.toUpperCase() || "ANALYZING";
+  let threatColor = "text-slate-400";
+  if (threatLevel === 'HIGH' || threatLevel === 'CRITICAL') threatColor = "text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]";
+  else if (threatLevel === 'MEDIUM') threatColor = "text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]";
+  else if (threatLevel === 'LOW') threatColor = "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]";
+
+  // --- 3. PDF EXPORT ---
   const handleExportPDF = async () => {
     if (!reportRef.current) return;
     setIsExporting(true);
@@ -165,11 +193,11 @@ function DashboardComponent() {
       
       let analysisText = "";
       if (selectedRegion === 'All') {
-         analysisText = `The national threat landscape currently reflects an average crime rate of ${avgCrimeRate} per lakh. Total logged incidents year-to-date stand at ${totalIncidents.toLocaleString()}. Law enforcement resources and predictive task forces should be strategically deployed to compounding high-priority zones, specifically targeting ${top5CrimeStates[0]?.name || 'key areas'} and ${top5CrimeStates[1]?.name || 'surrounding regions'}. Constant surveillance is recommended to monitor the investigation backlog.`;
+         analysisText = `The national threat landscape currently reflects an average crime rate of ${avgCrimeRate} per lakh. AI Predictive Models forecast a future threat trajectory of [${threatLevel}]. Total logged incidents year-to-date stand at ${totalIncidents.toLocaleString()}. Law enforcement resources and predictive task forces should be strategically deployed to compounding high-priority zones, specifically targeting ${top5CrimeStates[0]?.name || 'key areas'} and ${top5CrimeStates[1]?.name || 'surrounding regions'}. Constant surveillance is recommended to monitor the investigation backlog.`;
       } else {
          const stateTarget = activeData[0];
          if(stateTarget) {
-             analysisText = `Target Region: ${stateTarget.name.toUpperCase()}.\nIntelligence confirms a [${stateTarget.risk.toUpperCase()}] threat profile. The region has recorded ${stateTarget.totalCrime.toLocaleString()} total incidents with a formal chargesheet filing efficiency of ${stateTarget.chargesheetRate}%. Field operatives and localized rapid-response units are advised to prioritize investigative bottlenecks and focus on high-density threat vectors to improve judicial outcomes.`;
+             analysisText = `Target Region: ${stateTarget.name.toUpperCase()}.\nIntelligence confirms a [${stateTarget.risk.toUpperCase()}] current profile, with AI projecting a future trajectory of [${threatLevel}]. The region has recorded ${stateTarget.totalCrime.toLocaleString()} total incidents with a formal chargesheet filing efficiency of ${stateTarget.chargesheetRate}%. Field operatives and localized rapid-response units are advised to prioritize investigative bottlenecks and focus on high-density threat vectors to improve judicial outcomes.`;
          }
       }
 
@@ -238,6 +266,35 @@ function DashboardComponent() {
             </div>
           ) : (
             <>
+              {/* AI Forecasting Banner */}
+              <div className="bg-gradient-to-r from-indigo-950 to-slate-900 border border-indigo-500/30 p-6 rounded-xl shadow-2xl relative overflow-hidden z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+                
+                <div className="relative z-10 flex items-center space-x-4">
+                  <div className="p-3 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
+                    <BrainCircuit className="h-8 w-8 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Predictive AI Threat Engine</h2>
+                    <p className="text-indigo-200/60 text-sm mt-1">Forecasting future trajectory based on live intelligence vectors</p>
+                  </div>
+                </div>
+
+                <div className="relative z-10 flex flex-col items-end">
+                  <span className="text-xs font-mono text-slate-400 mb-1 uppercase tracking-widest">Projected Threat Level</span>
+                  {isForecasting ? (
+                    <div className="flex items-center space-x-3 text-indigo-400">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <span className="font-mono text-sm">CALCULATING...</span>
+                    </div>
+                  ) : (
+                    <span className={`text-4xl font-black uppercase tracking-widest ${threatColor}`}>
+                      {threatLevel}
+                    </span>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
                 <KPICard title="Total Incidents (YTD)" value={totalIncidents.toLocaleString()} icon={AlertTriangle} trend={selectedRegion === 'All' ? "National Total" : "State Total"} trendColor="text-blue-400"/>
                 <KPICard title="Avg Crime Rate" value={avgCrimeRate} icon={TrendingUp} trend="Per Lakh" />
