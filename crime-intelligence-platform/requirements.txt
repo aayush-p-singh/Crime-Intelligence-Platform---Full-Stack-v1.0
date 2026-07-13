@@ -6,3 +6,4 @@ joblib
 gunicorn
 pandas
 Neo4j
+dotenv
