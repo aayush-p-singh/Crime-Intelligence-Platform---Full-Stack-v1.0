@@ -24,9 +24,8 @@ from services.crime_officer import officer
 # Flask Initialization
 # ==========================================================
 app = Flask(__name__)
-CORS(
-    app,
-    resources={r"/*": {"origins": "https://crime-intelligence-kwy1igbuc-algo-reaper-x.vercel.app/"}}
+# The "*" acts as a wildcard, letting ANY frontend connect to it
+CORS(app, resources={r"/*": {"origins": "*"}})
 )
 
 # ==========================================================
