@@ -5,9 +5,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-# --- Imports preserved exactly as requested ---
-app = Flask(__name__)
-CORS(app) 
+
 
 import joblib
 import pandas as pd
