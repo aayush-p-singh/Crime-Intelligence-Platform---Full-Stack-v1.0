@@ -28,7 +28,7 @@ from services.crime_officer import officer
 app = Flask(__name__)
 CORS(
     app,
-    resources={r"/*": {"origins": "*"}}
+    resources={r"/*": {"origins": "https://crime-intelligence-kwy1igbuc-algo-reaper-x.vercel.app/"}}
 )
 
 # ==========================================================
