@@ -11,6 +11,10 @@ PASSWORD = os.getenv("NEO4J_PASSWORD")
 
 class Neo4jConnection:
     def __init__(self):
+        # Sanity check: verify these are actually loaded
+        if not all([URI, USERNAME, PASSWORD]):
+            raise ValueError(f"CRITICAL: Missing environment variables! URI={URI}, USER={USERNAME}")
+            
         self.driver = GraphDatabase.driver(
             URI,
             auth=(USERNAME, PASSWORD)
