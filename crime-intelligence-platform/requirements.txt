@@ -5,5 +5,5 @@ scikit-learn
 joblib
 gunicorn
 pandas
-Neo4j
+neo4j
 dotenv
