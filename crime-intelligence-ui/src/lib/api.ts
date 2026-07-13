@@ -1,5 +1,5 @@
 // API Base Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://crime-intelligence.onrender.com';
+const API_BASE_URL = 'https://crime-intelligence.onrender.com';
 
 // --- Type Definitions ---
 
