@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform | Knowledge Graph</title>
+    
+    <link rel="stylesheet" href="/static/css/graph.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://media.base44.com/images/public/6a535feb08a334fa6aabf418/de9555acd_logo.png" alt="Sentinel Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h2>CRIME INTEL</h2>
+                    <span>AI PLATFORM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">Main Command</span>
+                <a href="/dashboard" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i data-lucide="radio-receiver"></i>
+                    <span>Intel Flow</span>
+                </a>
+                <a href="/compare" class="nav-item">
+                    <i data-lucide="crosshair"></i>
+                    <span>Threat Matrix</span>
+                </a>
+                
+                <span class="nav-heading">Operations</span>
+                <a href="/graph" class="nav-item active">
+                    <i data-lucide="share-2"></i>
+                    <span>Knowledge Graph</span>
+                </a>
+                <a href="/compare" class="nav-item">
+                    <i data-lucide="git-compare"></i>
+                    <span>Sector Compare</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <i data-lucide="network"></i>
+                    <span>Asset Tracking</span>
+                </a>
+                <a href="/login" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span>Configuration</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="clearance-badge">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Clearance: Level 5</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar glass-panel">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" class="search-input" id="global-search" placeholder="Query Intel Database, IP Addresses, or Threat Signatures...">
+                    <kbd class="kbd-shortcut">⌘K</kbd>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="icon-btn pulse-alert">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">4</span>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="terminal"></i>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Operator Avatar">
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Cmdr. Vance</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-wrapper">
+                
+                <!-- Page Header -->
+                <div class="graph-header animate-fade-in delay-1">
+                    <div>
+                        <h1 class="page-title">Crime Intelligence Knowledge Graph</h1>
+                        <p class="page-subtitle">Interactive visualization of relationships between states, crime metrics, AI predictions and intelligence insights.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="toggle-cypher-btn" class="btn secondary-btn">
+                            <i data-lucide="terminal"></i> Cypher Query
+                        </button>
+                        <button class="btn primary-btn"><i data-lucide="download"></i> Export Topology</button>
+                    </div>
+                </div>
+
+                <!-- Neo4j Query Panel (Hidden by default, toggled via JS) -->
+                <div id="cypher-panel" class="cypher-panel glass-panel animate-fade-in hidden">
+                    <div class="cypher-input-wrapper">
+                        <span class="cypher-prompt">neo4j></span>
+                        <input type="text" id="cypher-input" class="cypher-input" placeholder="MATCH (s:State)-[r]->(m) RETURN s,r,m LIMIT 50">
+                    </div>
+                    <button id="run-cypher-btn" class="btn primary-btn icon-only-btn"><i data-lucide="play"></i></button>
+                </div>
+
+                <!-- Main Layout Grid -->
+                <div class="graph-grid">
+                    
+                    <!-- Left: Large Graph Container -->
+                    <div class="panel glass-panel graph-main-panel col-span-9 animate-fade-in delay-2">
+                        
+                        <!-- Overlay: Top Left (Search & Filter) -->
+                        <div class="graph-overlay top-left">
+                            <div class="graph-search glass-panel">
+                                <i data-lucide="search"></i>
+                                <input type="text" id="node-search" placeholder="Search State...">
+                            </div>
+                            <button id="graph-filter-btn" class="btn secondary-btn icon-only-btn glass-panel" title="Filter Nodes">
+                                <i data-lucide="filter"></i>
+                            </button>
+                        </div>
+
+                        <!-- Overlay: Top Right (Zoom Controls) -->
+                        <div class="graph-overlay top-right glass-panel zoom-controls">
+                            <button class="icon-btn" id="zoom-in-btn" title="Zoom In"><i data-lucide="plus"></i></button>
+                            <div class="control-divider"></div>
+                            <button class="icon-btn" id="zoom-out-btn" title="Zoom Out"><i data-lucide="minus"></i></button>
+                            <div class="control-divider"></div>
+                            <button class="icon-btn" id="reset-zoom-btn" title="Fit to Screen"><i data-lucide="maximize"></i></button>
+                        </div>
+
+                        <!-- Graph Container (Empty for Live Injection) -->
+                        <div class="graph-container" id="network-graph-container">
+                            <!-- Backend D3.js/Cytoscape SVG or Canvas goes here -->
+                            <div class="graph-placeholder-text">
+                                <i data-lucide="share-2"></i>
+                                <span>Loading Crime Intelligence Graph...</span>
+                            </div>
+                        </div>
+
+                        <!-- Overlay: Bottom Left (Legend) -->
+                        <div class="graph-overlay bottom-left glass-panel graph-legend">
+                            <h4 class="legend-title">Entity Types</h4>
+                            <div class="legend-grid">
+                                <div class="legend-item"><span class="dot red"></span> State</div>
+                                <div class="legend-item"><span class="dot blue"></span> Crime Metric</div>
+                                <div class="legend-item"><span class="dot purple"></span> AI Prediction</div>
+                                <div class="legend-item"><span class="dot cyan"></span> Intelligence Insight</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Node Details Panel -->
+                    <div class="panel glass-panel node-details-panel col-span-3 animate-fade-in delay-3" id="node-details-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">State Intelligence</h3>
+                            <button class="icon-btn"><i data-lucide="more-vertical"></i></button>
+                        </div>
+                        
+                        <div class="node-details-content">
+                            <!-- Default Empty State -->
+                            <div id="empty-node-state" class="empty-state">
+                                <i data-lucide="mouse-pointer-click" class="empty-icon"></i>
+                                <p>Select any node to view crime intelligence details.</p>
+                            </div>
+                            
+                            <!-- Dynamic Content (Hidden until node is clicked) -->
+                            <div id="active-node-state" class="active-state hidden">
+                                <div class="node-header">
+                                    <div class="node-icon-wrapper" id="detail-node-icon-wrapper">
+                                        <i data-lucide="shield-alert" id="detail-node-icon"></i>
+                                    </div>
+                                    <div class="node-title-group">
+                                        <h4 id="detail-node-name">--</h4>
+                                        <span id="detail-node-type" class="tech-tag">--</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-list">
+                                    <div class="detail-row">
+                                        <span class="detail-label">State</span>
+                                        <span class="detail-value terminal-font" id="detail-node-id">--</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Risk Level</span>
+                                        <span class="detail-value text-danger" id="detail-node-risk">--</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Crime Rate</span>
+                                        <span class="detail-value" id="detail-node-seen">--</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Relationships</span>
+                                        <span class="detail-value highlight" id="detail-node-connections">--</span>
+                                    </div>
+                                </div>
+
+                                <div class="node-actions">
+                                    <button class="btn secondary-btn full-width"><i data-lucide="crosshair"></i> Focus Node</button>
+                                    <button class="btn primary-btn full-width"><i data-lucide="file-text"></i> Generate Insight</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bottom-spacer"></div>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <footer class="footer-status-bar glass-panel">
+                <div class="status-left">
+                    <div class="status-item">
+                        <i data-lucide="server"></i> Flask API: <span class="highlight">Online</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <i data-lucide="shield-check"></i> Neo4j: <span class="highlight">Connected</span>
+                    </div>
+                </div>
+                
+                <div class="status-right">
+                    <div class="status-item terminal-font">
+                        Sarvam AI <span class="text-success">14ms</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item terminal-font">
+                        SYS_TIME: <span id="sys-time">00:00:00 UTC</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/static/js/graph.js"></script>
+</body>
+</html>

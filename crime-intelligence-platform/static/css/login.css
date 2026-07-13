@@ -1,0 +1,396 @@
+/* ==========================================================================
+   CSS Variables & Base Theme (Inherited from OS)
+   ========================================================================== */
+   :root {
+    --bg-base: #020617;
+    --bg-panel: rgba(15, 23, 42, 0.65);
+    --bg-panel-hover: rgba(30, 41, 59, 0.8);
+    
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(34, 211, 238, 0.3);
+    
+    --accent-cyan: #22d3ee;
+    --accent-blue: #3b82f6;
+    --accent-red: #ef4444;
+    --accent-green: #10b981;
+    --accent-warning: #f59e0b;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    
+    --transition-fast: 0.15s ease-out;
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+.terminal-font { font-family: var(--font-mono); }
+.text-success { color: var(--accent-green); }
+.text-cyan { color: var(--accent-cyan); }
+
+/* ==========================================================================
+   Animated Ambient Background
+   ========================================================================== */
+.ambient-background {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.tactical-grid {
+    position: absolute;
+    width: 200%; height: 200%;
+    top: -50%; left: -50%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(60deg) translateY(-100px);
+    animation: gridMove 20s linear infinite;
+    pointer-events: none;
+}
+
+.radial-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.glow-1 {
+    background: var(--accent-blue);
+    top: -100px; left: -100px;
+    animation: drift 15s ease-in-out infinite alternate;
+}
+
+.glow-2 {
+    background: var(--accent-cyan);
+    bottom: -100px; right: -100px;
+    animation: drift 20s ease-in-out infinite alternate-reverse;
+}
+
+/* ==========================================================================
+   Login Wrapper & Panel Layout
+   ========================================================================== */
+.login-wrapper {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 24px;
+}
+
+.glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.login-panel {
+    width: 100%;
+    max-width: 440px;
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Accent top border for the panel */
+.login-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+}
+
+/* ==========================================================================
+   Header Section
+   ========================================================================== */
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.logo-container {
+    margin-bottom: 8px;
+}
+
+.brand-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.6));
+}
+
+.brand-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.brand-title .version {
+    font-size: 0.8rem;
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    vertical-align: super;
+}
+
+.brand-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.clearance-warning {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--accent-red);
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    animation: pulseBorder 2s infinite;
+}
+.clearance-warning svg { width: 14px; height: 14px; }
+
+/* ==========================================================================
+   Form Elements
+   ========================================================================== */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-smooth);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 1px var(--accent-cyan), inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-tertiary);
+    pointer-events: none;
+    transition: color var(--transition-fast);
+}
+
+.input-wrapper:focus-within .input-icon {
+    color: var(--accent-cyan);
+}
+
+.secure-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 14px 12px 42px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: var(--font-mono);
+    outline: none;
+}
+
+.secure-input::placeholder { color: var(--text-tertiary); font-family: var(--font-sans); font-size: 0.9rem; }
+
+/* Password Visibility Toggle */
+.visibility-btn {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.visibility-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+.visibility-btn svg { width: 16px; height: 16px; }
+
+/* Actions row (Checkbox + Forgot Password) */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -4px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkmark {
+    height: 18px;
+    width: 18px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+.checkmark svg { width: 12px; height: 12px; color: transparent; transition: var(--transition-fast); }
+.checkbox-container:hover input ~ .checkmark { border-color: rgba(255,255,255,0.2); }
+.checkbox-container input:checked ~ .checkmark { background-color: var(--accent-blue); border-color: var(--accent-blue); }
+.checkbox-container input:checked ~ .checkmark svg { color: white; }
+
+.checkbox-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.forgot-link {
+    font-size: 0.8rem;
+    color: var(--accent-cyan);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+.forgot-link:hover { text-decoration: underline; text-shadow: 0 0 8px rgba(34, 211, 238, 0.4); }
+
+/* Submit Button */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition-smooth); border: none; }
+.primary-btn { background: var(--accent-blue); color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 1px 1px rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 1px; }
+.primary-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 0 25px rgba(59, 130, 246, 0.5), inset 0 1px 1px rgba(255,255,255,0.2); }
+.primary-btn svg { width: 18px; height: 18px; }
+.login-btn { width: 100%; margin-top: 8px; }
+
+/* ==========================================================================
+   Footer Terminal Status
+   ========================================================================== */
+.login-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    padding-top: 16px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+}
+
+.blinking-cursor { animation: blink 1s step-end infinite; }
+
+/* Status Overlay (Bottom Left) */
+.system-status-overlay {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 40px; }
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+@keyframes pulseBorder {
+    0%, 100% { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 0 transparent; }
+    50% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.animate-fade-in { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.delay-1 { animation-delay: 0.2s; }
+
+/* Responsiveness */
+@media (max-width: 480px) {
+    .login-panel { padding: 32px 24px; }
+    .system-status-overlay { display: none; }
+}

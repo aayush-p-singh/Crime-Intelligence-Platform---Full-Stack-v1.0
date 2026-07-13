@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform | Crime Intelligence Officer</title>
+    
+    <link rel="stylesheet" href="/static/css/cio.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://media.base44.com/images/public/6a535feb08a334fa6aabf418/de9555acd_logo.png" alt="Sentinel Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h2>CRIME INTEL</h2>
+                    <span>AI PLATFORM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">Main Command</span>
+                <a href="/dashboard" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i data-lucide="radio-receiver"></i>
+                    <span>Intel Flow</span>
+                </a>
+                <a href="/compare" class="nav-item">
+                    <i data-lucide="crosshair"></i>
+                    <span>Threat Matrix</span>
+                </a>
+                
+                <span class="nav-heading">Operations</span>
+                <a href="/compare" class="nav-item">
+                    <i data-lucide="git-compare"></i>
+                    <span>Sector Compare</span>
+                </a>
+                <a href="/chat" class="nav-item active">
+                    <i data-lucide="cpu"></i>
+                    <span>AI Officer</span>
+                </a>
+                <a href="/login" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span>Configuration</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="clearance-badge">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Clearance: Level 5</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar glass-panel">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" class="search-input" id="global-search" placeholder="Query Intel Database, IP Addresses, or Threat Signatures...">
+                    <kbd class="kbd-shortcut">⌘K</kbd>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="icon-btn pulse-alert">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">4</span>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="terminal"></i>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Operator Avatar">
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Cmdr. Vance</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content tailored for Chat Layout -->
+            <div class="content-wrapper chat-layout-wrapper">
+                
+                <div class="chat-grid">
+                    
+                    <!-- Left: Conversation Sidebar -->
+                    <div class="panel glass-panel chat-history-panel animate-fade-in delay-1">
+                        <div class="chat-history-header">
+                            <button id="new-chat-btn" class="btn primary-btn full-width">
+                                <i data-lucide="plus"></i> New Conversation
+                            </button>
+                            <div class="history-search">
+                                <i data-lucide="search"></i>
+                                <input type="text" id="chat-search" placeholder="Search archives...">
+                            </div>
+                        </div>
+
+                        <div class="chat-history-list" id="conversation-list">
+                            <!-- Flask will inject historical threads here -->
+                            <div class="history-group-label">Recent Intel</div>
+                            
+                            <!-- Placeholder Active Item -->
+                            <div class="chat-session active" data-chat-id="1">
+                                <i data-lucide="message-square" class="session-icon"></i>
+                                <div class="session-details">
+                                    <span class="session-title">Sector 4 Anomaly Analysis</span>
+                                    <span class="session-time">Just now</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Placeholder Inactive Item -->
+                            <div class="chat-session" data-chat-id="2">
+                                <i data-lucide="shield-alert" class="session-icon text-red"></i>
+                                <div class="session-details">
+                                    <span class="session-title">Encrypted SATCOM Decrypt</span>
+                                    <span class="session-time">2 hours ago</span>
+                                </div>
+                            </div>
+
+                            <div class="chat-session" data-chat-id="3">
+                                <i data-lucide="network" class="session-icon text-cyan"></i>
+                                <div class="session-details">
+                                    <span class="session-title">Node Routing Diagnostics</span>
+                                    <span class="session-time">Yesterday</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Main Chat Window -->
+                    <div class="panel glass-panel chat-window-panel animate-fade-in delay-2">
+                        
+                        <!-- Chat Header -->
+                        <div class="chat-header">
+                            <div class="ai-identity">
+                                <div class="ai-avatar">
+                                    <i data-lucide="cpu"></i>
+                                </div>
+                                <div class="ai-info">
+                                    <h3 class="panel-title">Crime Intelligence Officer (C.I.O)</h3>
+                                    <div class="ai-status">
+                                        <span class="dot live"></span>
+                                        <span class="status-text">Sarvam AI Connected</span>
+                                        <span class="tech-tag">Sarvam AI</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="icon-btn" title="Export Transcript"><i data-lucide="download"></i></button>
+                                <button class="icon-btn" title="Settings"><i data-lucide="sliders"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Feed / Message Area -->
+                        <div class="chat-feed" id="chat-feed">
+                            <!-- Flask/JS will inject messages here -->
+                            
+                            <!-- AI Welcome Message Placeholder -->
+                            <div class="message ai-message">
+                                <div class="msg-avatar"><i data-lucide="cpu"></i></div>
+                                <div class="msg-content">
+                                    <div class="msg-bubble glass-panel">
+                                        <p>Hello! I am your Crime Intelligence Officer.
+
+                                        I can analyze NCRB crime data, compare states, explain crime trends, predict risk levels, and answer questions using AI.
+
+                                        How can I assist you today?</p>
+                                    </div>
+                                    <span class="msg-time">System Time: <span class="terminal-font">14:02:11</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Example User Message Placeholder -->
+                            <!--
+                            <div class="message user-message">
+                                <div class="msg-content">
+                                    <div class="msg-bubble">
+                                        <p>Cross-reference those signals with known kinetic threat signatures.</p>
+                                    </div>
+                                    <span class="msg-time">Read</span>
+                                </div>
+                                <div class="msg-avatar"><img src="https://i.pravatar.cc/150?img=33" alt="User"></div>
+                            </div>
+                            -->
+                        </div>
+
+                        <!-- Chat Input Area -->
+                        <div class="chat-input-container">
+                            
+                            <!-- Suggested Prompts -->
+                            <div class="suggested-prompts" id="suggested-prompts">
+                                <button class="prompt-chip">Compare Delhi and Maharashtra</button>
+                                <button class="prompt-chip">Explain NCRB Crime Data</button>
+                                <button class="prompt-chip">Generate AI Crime Report</button>
+                            </div>
+
+                            <!-- Input Box -->
+                            <div class="input-box-wrapper glass-panel">
+                                <button id="attachment-btn" class="icon-btn input-action-btn" title="Attach File or Log">
+                                    <i data-lucide="paperclip"></i>
+                                </button>
+                                
+                                <textarea id="messageInput" class="chatInput" placeholder="Ask anything about crime intelligence..." rows="1"></textarea>
+                                
+                                <div class="input-right-actions">
+                                    <button id="voice-btn" class="icon-btn input-action-btn" title="Voice Command" onclick="sendMessage()">
+                                        <i data-lucide="mic"></i>
+                                    </button>
+                                    <button id="send-btn" class="btn primary-btn send-btn">
+                                        <i data-lucide="send"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="input-footer">
+                                <span>C.I.O may produce inaccurate intelligence. Verify critical outputs.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <footer class="footer-status-bar glass-panel">
+                <div class="status-left">
+                    <div class="status-item">
+                        <i data-lucide="server"></i> Flask API: <span class="highlight">Online</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <i data-lucide="shield-check"></i> Neo4j: <span class="highlight">Active</span>
+                    </div>
+                </div>
+                
+                <div class="status-right">
+                    <div class="status-item terminal-font">
+                        Sarvam AI <span class="text-success">14ms</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item terminal-font">
+                        SYS_TIME: <span id="sys-time">00:00:00 UTC</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/static/js/cio.js"></script>
+</body>
+</html>

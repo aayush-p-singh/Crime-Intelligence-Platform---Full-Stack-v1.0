@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform | Secure Login</title>
+    
+    <link rel="stylesheet" href="/static/css/login.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Animated Ambient Background -->
+    <div class="ambient-background">
+        <div class="tactical-grid"></div>
+        <div class="radial-glow glow-1"></div>
+        <div class="radial-glow glow-2"></div>
+    </div>
+
+    <div class="login-wrapper">
+        
+        <!-- Main Login Glass Panel -->
+        <div class="login-panel glass-panel animate-fade-in">
+            
+            <!-- Header section -->
+            <div class="login-header">
+                <div class="logo-container">
+                    <img src="https://media.base44.com/images/public/6a535feb08a334fa6aabf418/de9555acd_logo.png" alt="Sentinel Logo" class="brand-logo pulse-glow">
+                </div>
+                <h1 class="brand-title">Crime Intelligence Platform <span class="version">v1.0</span></h1>
+                <p class="brand-subtitle terminal-font">Secure Access Portal</p>
+                
+                <div class="clearance-warning">
+                    <i data-lucide="shield-alert"></i>
+                    <span>AUTHORIZED USERS ONLY</span>
+                </div>
+            </div>
+
+            <!-- Login Form (Hooks ready for Flask WTForms/Auth) -->
+            <form id="login-form" class="login-form" action="/login" method="POST">
+                
+                <div class="input-group">
+                    <label for="username" class="input-label">Username</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="user" class="input-icon"></i>
+                        <input type="text" id="username" name="username" class="secure-input" placeholder="Enter Username..." required autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password" class="input-label">Password</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="key" class="input-icon"></i>
+                        <input type="password" id="password" name="password" class="secure-input" placeholder="••••••••••••" required>
+                        <button type="button" id="toggle-password" class="icon-btn visibility-btn" tabindex="-1">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember-me" name="remember_me">
+                        <span class="checkmark">
+                            <i data-lucide="check"></i>
+                        </span>
+                        <span class="checkbox-label">Remember Me</span>
+                    </label>
+                    
+                    <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" id="login-btn" class="btn primary-btn login-btn">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Login</span>
+                </button>
+            </form>
+
+            <!-- Footer terminal text -->
+            <div class="login-footer terminal-font">
+                <span id="typing-status">Establishing secure connection...</span>
+                <span class="blinking-cursor">_</span>
+            </div>
+        </div>
+        
+        <!-- External System Status -->
+        <div class="system-status-overlay terminal-font animate-fade-in delay-1">
+            <div class="status-item">SYS_TIME: <span id="sys-time">00:00:00 UTC</span></div>
+            <div class="status-item">NODE: <span class="text-cyan">ALPHA-7</span></div>
+            <div class="status-item">ENC: <span class="text-success">AES-256-GCM</span></div>
+        </div>
+    </div>
+
+    <script src="/static/js/login.js"></script>
+</body>
+</html>

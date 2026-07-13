@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform | State Comparison</title>
+    
+    <link rel="stylesheet" href="/static/css/compare.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://media.base44.com/images/public/6a535feb08a334fa6aabf418/de9555acd_logo.png" alt="Sentinel Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h2>CRIME INTEL</h2>
+                    <span>AI PLATFORM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">Main Command</span>
+                <a href="/dashboard" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i data-lucide="radio-receiver"></i>
+                    <span>Intel Flow</span>
+                </a>
+                <a href="/compare" class="nav-item">
+                    <i data-lucide="crosshair"></i>
+                    <span>Threat Matrix</span>
+                </a>
+                
+                <span class="nav-heading">Operations</span>
+                <a href="/graph" class="nav-item active">
+                    <i data-lucide="git-compare"></i>
+                    <span>Sector Compare</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <i data-lucide="network"></i>
+                    <span>Asset Tracking</span>
+                </a>
+                <a href="login" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span>Configuration</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="clearance-badge">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Clearance: Level 5</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar glass-panel">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" class="search-input" id="global-search" placeholder="Query Intel Database, IP Addresses, or Threat Signatures...">
+                    <kbd class="kbd-shortcut">⌘K</kbd>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="icon-btn pulse-alert">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">4</span>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="terminal"></i>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Operator Avatar">
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Cmdr. Vance</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-wrapper">
+                
+                <!-- Header & State Selectors -->
+                <div class="compare-header animate-fade-in delay-1">
+                    <div class="header-titles">
+                        <h1 class="page-title">State Crime Intelligence Comparison</h1>
+                        <p class="page-subtitle">Compare NCRB crime statistics, AI predictions and state intelligence.</p>
+                    </div>
+                    
+                    <div class="selector-container">
+                        <div class="state-selector glass-panel state-a">
+                            <div class="selector-indicator blue"></div>
+                            <select id="state-a-select" class="custom-select">
+                                <option value="" disabled selected>Select State...</option>
+                                <!-- Flask will inject options here -->
+                            </select>
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+
+                        <div class="vs-badge">VS</div>
+
+                        <div class="state-selector glass-panel state-b">
+                            <div class="selector-indicator red"></div>
+                            <select id="state-b-select" class="custom-select">
+                                <option value="" disabled selected>Select State...</option>
+                                <!-- Flask will inject options here -->
+                            </select>
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                        
+                        <div class="date-picker glass-panel">
+                            <i data-lucide="calendar"></i>
+                            <select id="timeframe-select" class="custom-select">
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                            </select>
+                        </div>
+                        
+                        <button id="run-compare-btn" class="btn primary-btn"><i data-lucide="play"></i> Analyze</button>
+                    </div>
+                </div>
+
+                <!-- KPI Comparison Cards -->
+                <div class="kpi-compare-grid animate-fade-in delay-2">
+                    
+                    <!-- KPI Card 1 -->
+                    <div class="kpi-compare-card glass-panel">
+                        <div class="kpi-card-header">
+                            <span class="kpi-title">Total Crime</span>
+                            <i data-lucide="alert-triangle" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-split-view">
+                            <div class="kpi-side state-a-side">
+                                <span class="kpi-value" id="kpi-incidents-a">--</span>
+                                <span class="kpi-trend" id="trend-incidents-a">--</span>
+                            </div>
+                            <div class="kpi-divider"></div>
+                            <div class="kpi-side state-b-side">
+                                <span class="kpi-value" id="kpi-incidents-b">--</span>
+                                <span class="kpi-trend" id="trend-incidents-b">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card 2 -->
+                    <div class="kpi-compare-card glass-panel">
+                        <div class="kpi-card-header">
+                            <span class="kpi-title">Women Crime</span>
+                            <i data-lucide="radio" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-split-view">
+                            <div class="kpi-side state-a-side">
+                                <span class="kpi-value" id="kpi-signals-a">--</span>
+                                <span class="kpi-trend" id="trend-signals-a">--</span>
+                            </div>
+                            <div class="kpi-divider"></div>
+                            <div class="kpi-side state-b-side">
+                                <span class="kpi-value" id="kpi-signals-b">--</span>
+                                <span class="kpi-trend" id="trend-signals-b">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card 3 -->
+                    <div class="kpi-compare-card glass-panel">
+                        <div class="kpi-card-header">
+                            <span class="kpi-title">Crime Rate</span>
+                            <i data-lucide="shield-alert" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-split-view">
+                            <div class="kpi-side state-a-side">
+                                <span class="kpi-value text-danger" id="kpi-vulns-a">--</span>
+                                <span class="kpi-trend" id="trend-vulns-a">--</span>
+                            </div>
+                            <div class="kpi-divider"></div>
+                            <div class="kpi-side state-b-side">
+                                <span class="kpi-value text-danger" id="kpi-vulns-b">--</span>
+                                <span class="kpi-trend" id="trend-vulns-b">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card 4 -->
+                    <div class="kpi-compare-card glass-panel">
+                        <div class="kpi-card-header">
+                            <span class="kpi-title">Chargesheet Rate</span>
+                            <i data-lucide="check-circle" class="kpi-icon"></i>
+                        </div>
+                        <div class="kpi-split-view">
+                            <div class="kpi-side state-a-side">
+                                <span class="kpi-value" id="kpi-mitigation-a">--</span>
+                                <span class="kpi-trend" id="trend-mitigation-a">--</span>
+                            </div>
+                            <div class="kpi-divider"></div>
+                            <div class="kpi-side state-b-side">
+                                <span class="kpi-value" id="kpi-mitigation-b">--</span>
+                                <span class="kpi-trend" id="trend-mitigation-b">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Grid Charts -->
+                <div class="bento-grid">
+                    
+                    <!-- Trend Comparison Chart -->
+                    <div class="panel glass-panel col-span-8 animate-fade-in delay-3">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Crime Trend Comparison</h3>
+                            <div class="panel-actions">
+                                <div class="chart-legend">
+                                    <span class="legend-item"><span class="dot blue"></span> Sector Alpha</span>
+                                    <span class="legend-item"><span class="dot purple"></span> Sector Beta</span>
+                                </div>
+                                <button class="icon-btn"><i data-lucide="download"></i></button>
+                            </div>
+                        </div>
+                        <div class="chart-container large-chart">
+                            <canvas id="trendCompareChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Radar Vector Analysis -->
+                    <div class="panel glass-panel col-span-4 animate-fade-in delay-4">
+                        <div class="panel-header">
+                            <h3 class="panel-title">State Crime Intelligence Radar</h3>
+                        </div>
+                        <div class="chart-container large-chart">
+                            <canvas id="radarCompareChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Category Distribution Bar Chart -->
+                    <div class="panel glass-panel col-span-6 animate-fade-in delay-5">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Categorical Crime Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="categoryCompareChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Asset Allocation Comparison -->
+                    <div class="panel glass-panel col-span-6 animate-fade-in delay-5">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Overall Crime Analysis</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="assetCompareChart"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="bottom-spacer"></div>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <footer class="footer-status-bar glass-panel">
+                <div class="status-left">
+                    <div class="status-item">
+                        <i data-lucide="server"></i> Flask API: <span class="highlight">Online</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <i data-lucide="shield-check"></i> NEO4J: <span class="highlight">CONNECTED</span>
+                    </div>
+                </div>
+                
+                <div class="status-right">
+                    <div class="status-item terminal-font">
+                        Sarvam AI <span class="text-success">14ms</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item terminal-font">
+                        SYS_TIME: <span id="sys-time">00:00:00 UTC</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/static/js/compare.js"></script>
+</body>
+</html>

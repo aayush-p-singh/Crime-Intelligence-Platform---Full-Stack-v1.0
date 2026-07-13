@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform | Dashboard</title>
+    
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://media.base44.com/images/public/6a535feb08a334fa6aabf418/de9555acd_logo.png" alt="Sentinel Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h2>CRIME INTEL</h2>
+                    <span>AI PLATFORM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">Main Command</span>
+                <a href="/dashboard" class="nav-item active">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/map" class="nav-item">
+                    <i data-lucide="radio-receiver"></i>
+                    <span>Intel Flow</span>
+                </a>
+                <a href="/threat-matrix" class="nav-item">
+                    <i data-lucide="crosshair"></i>
+                    <span>Threat Matrix</span>
+                </a>
+                
+                <span class="nav-heading">Operations</span>
+                <a href="/asset-tracking" class="nav-item">
+                    <i data-lucide="network"></i>
+                    <span>Asset Tracking</span>
+                </a>
+                <a href="/incident-logs" class="nav-item">
+                    <i data-lucide="file-warning"></i>
+                    <span>Incident Logs</span>
+                </a>
+                <a href="/configuration" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span>Configuration</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="clearance-badge">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Clearance: Level 5</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar glass-panel">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Query Intel Database, IP Addresses, or Threat Signatures...">
+                    <kbd class="kbd-shortcut">⌘K</kbd>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="icon-btn pulse-alert">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">4</span>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="terminal"></i>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Operator Avatar">
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Cmdr. Vance</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Dashboard Content -->
+            <div class="content-wrapper">
+                
+                <!-- Dashboard Header -->
+                <div class="dashboard-header animate-fade-in delay-1">
+                    <div>
+                        <h1 class="page-title">
+                        Crime Intelligence Dashboard
+                        </h1>
+
+                        <p class="page-subtitle">
+                        AI-powered NCRB Crime Analytics & Predictive Intelligence
+                        </p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="date-picker glass-panel">
+                            <i data-lucide="calendar"></i>
+                            <span>Last 24 Hours</span>
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                        <button class="btn primary-btn"><i data-lucide="download"></i> Export NCRB Report</button>
+                    </div>
+                </div>
+
+                <!-- KPI Grid -->
+                <div class="kpi-grid animate-fade-in delay-2">
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Total Crimes</span>
+                            <div class="kpi-icon blue"><i data-lucide="radio"></i></div>
+                        </div>
+                        <div class="kpi-value">2.4M</div>
+                        <div class="kpi-footer">
+                            <span class="trend positive"><i data-lucide="trending-up"></i> 8.2%</span>
+                            <span class="kpi-subtext">vs last period</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-header">
+                            <span class="kpi-title">High Risk States</span>
+                            <div class="kpi-icon red"><i data-lucide="shield-alert"></i></div>
+                        </div>
+                        <div class="kpi-value text-danger">142</div>
+                        <div class="kpi-footer">
+                            <span class="trend negative"><i data-lucide="trending-up"></i> 12.4%</span>
+                            <span class="kpi-subtext">Requires immediate action</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Women Crime Cases</span>
+                            <div class="kpi-icon cyan"><i data-lucide="satellite"></i></div>
+                        </div>
+                        <div class="kpi-value">8,904</div>
+                        <div class="kpi-footer">
+                            <span class="trend positive"><i data-lucide="check-circle"></i> 99.8%</span>
+                            <span class="kpi-subtext">Operational uptime</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Average Chargesheet Rate</span>
+                            <div class="kpi-icon purple"><i data-lucide="scan"></i></div>
+                        </div>
+                        <div class="kpi-value">847</div>
+                        <div class="kpi-footer">
+                            <span class="trend positive"><i data-lucide="trending-down"></i> 3.1%</span>
+                            <span class="kpi-subtext">Resolved by AI automatically</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Charts Grid -->
+                <div class="bento-grid">
+                    
+                    <!-- Large Trend Chart -->
+                    <div class="panel glass-panel col-span-8 animate-fade-in delay-3">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Crime Trend Analysis</h3>
+                            <div class="panel-actions">
+                                <button class="icon-btn"><i data-lucide="maximize-2"></i></button>
+                                <button class="icon-btn"><i data-lucide="more-vertical"></i></button>
+                            </div>
+                        </div>
+                        <div class="chart-container large-chart">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Threat Level Widget -->
+                    <div class="panel glass-panel col-span-4 threat-panel animate-fade-in delay-4">
+                        <div class="panel-header">
+                            <h3 class="panel-title">National Crime Risk</h3>
+                        </div>
+                        <div class="threat-widget">
+                            <div class="threat-indicator defcon-3">
+                                <div class="threat-ring"></div>
+                                <div class="threat-value">3</div>
+                            </div>
+                            <h4 class="threat-label text-warning">MEDIUM RISK</h4>
+                            <p class="threat-desc">AI model predicts a moderate national crime risk based on NCRB 2022 statistics.</p>
+                        </div>
+                    </div>
+
+                    <!-- Heatmap Panel -->
+                    <div class="panel glass-panel col-span-6 animate-fade-in delay-4">
+                        <div class="panel-header">
+                            <h3 class="panel-title">India Crime Heatmap</h3>
+                            <span class="tech-tag">Live</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="heatmapChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Category Distribution -->
+                    <div class="panel glass-panel col-span-6 animate-fade-in delay-5">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Crime Category Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Crime Prediction -->
+                    <div class="panel glass-panel col-span-4 animate-fade-in delay-5">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Crime Prediction</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="forecastChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Crime Pattern Timeline -->
+                    <div class="panel glass-panel col-span-4 animate-fade-in delay-6">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Crime Pattern Timeline</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="temporalChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Activity Panel -->
+                    <div class="panel glass-panel col-span-4 animate-fade-in delay-6">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Latest Crime Insights</h3>
+                            <button class="text-btn">View Log</button>
+                        </div>
+                        <div class="activity-feed">
+                            <div class="feed-item">
+                                <div class="feed-icon red"><i data-lucide="shield-alert"></i></div>
+                                <div class="feed-content">
+                                    <span class="feed-title">Unauthorized Access Attempt</span>
+                                    <span class="feed-time">2 mins ago • Sector 4</span>
+                                </div>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-icon cyan"><i data-lucide="satellite"></i></div>
+                                <div class="feed-content">
+                                    <span class="feed-title">Uplink Established: SAT-9X</span>
+                                    <span class="feed-time">14 mins ago • GEO-Orbit</span>
+                                </div>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-icon purple"><i data-lucide="wifi"></i></div>
+                                <div class="feed-content">
+                                    <span class="feed-title">Encrypted Transmission Intercepted</span>
+                                    <span class="feed-time">45 mins ago • Eastern Europe</span>
+                                </div>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-icon blue"><i data-lucide="file-check"></i></div>
+                                <div class="feed-content">
+                                    <span class="feed-title">Automated Threat Mitigation</span>
+                                    <span class="feed-time">1 hour ago • Node 0x7A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="bottom-spacer"></div>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <footer class="footer-status-bar glass-panel">
+                <div class="status-left">
+                    <div class="status-item">
+                        <i data-lucide="server"></i> Flask API Online: <span class="highlight">Neo4j Connected</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <i data-lucide="shield-check"></i> Random Forest Loaded <span class="highlight">Sarvam API Loaded</span>
+                    </div>
+                </div>
+                
+                <div class="status-right">
+                    <div class="status-item terminal-font">
+                        Uplink Ping: <span class="text-success">14ms</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item terminal-font">
+                        SYS_TIME: <span id="sys-time">00:00:00 UTC</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

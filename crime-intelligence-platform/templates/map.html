@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform | India Crime Map</title>
+    
+    <link rel="stylesheet" href="/static/css/map.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://media.base44.com/images/public/6a535feb08a334fa6aabf418/de9555acd_logo.png" alt="Sentinel Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h2>CRIME INTEL</h2>
+                    <span>AI PLATFORM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">/dashboard</span>
+                <a href="#" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i data-lucide="radio-receiver"></i>
+                    <span>/map</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <i data-lucide="crosshair"></i>
+                    <span>/compare</span>
+                </a>
+                
+                <span class="nav-heading">Operations</span>
+                <a href="#" class="nav-item">
+                    <i data-lucide="network"></i>
+                    <span>/graph</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i data-lucide="file-warning"></i>
+                    <span>/chat</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span>/login</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="clearance-badge">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Clearance: Level 5</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar glass-panel">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" class="search-input" id="global-search" placeholder="Query Intel Database, IP Addresses, or Threat Signatures...">
+                    <kbd class="kbd-shortcut">⌘K</kbd>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="icon-btn pulse-alert">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">4</span>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="terminal"></i>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Operator Avatar">
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Cmdr. Vance</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Map Content -->
+            <div class="content-wrapper">
+                
+                <!-- Page Header & Filter Bar -->
+                <div class="map-header animate-fade-in delay-1">
+                    <div>
+                        <h1 class="page-title">
+                        India Crime Intelligence Map
+                        </h1>
+
+                        <p class="page-subtitle">
+                        AI-powered visualization of NCRB crime statistics across Indian states
+                        </p>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <div class="filter-group glass-panel">
+                            <i data-lucide="filter" class="filter-icon"></i>
+                            <select id="threat-type-filter" class="filter-select">
+                                <option value="all">All Threat Types</option>
+                                <option value="cyber">Cyber Intrusion</option>
+                                <option value="kinetic">Kinetic Threat</option>
+                                <option value="signal">Signal Intercept</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-chevron"></i>
+                        </div>
+
+                        <div class="filter-group glass-panel">
+                            <i data-lucide="clock" class="filter-icon"></i>
+                            <select id="timeframe-filter" class="filter-select">
+                                <option value="24h">Last 24 Hours</option>
+                                <option value="7d">Past 7 Days</option>
+                                <option value="30d">Past 30 Days</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-chevron"></i>
+                        </div>
+                        
+                        <button id="refresh-map-btn" class="btn secondary-btn icon-only-btn">
+                            <i data-lucide="refresh-cw"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Layout Grid -->
+                <div class="map-grid">
+                    
+                    <!-- Left: Large India Map Container -->
+                    <div class="panel glass-panel map-main-panel col-span-8 animate-fade-in delay-2">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Crime Risk Distribution</h3>
+                            <div class="panel-actions">
+                                <span class="tech-tag"><span class="dot live"></span> Live Feed</span>
+                                <button class="icon-btn" id="zoom-in-btn"><i data-lucide="zoom-in"></i></button>
+                                <button class="icon-btn" id="zoom-out-btn"><i data-lucide="zoom-out"></i></button>
+                                <button class="icon-btn" id="reset-zoom-btn"><i data-lucide="maximize"></i></button>
+                            </div>
+                        </div>
+                        
+                        <!-- Map SVG Container (Empty for live injection/D3.js integration) -->
+                        <div class="map-container" id="india-map-container">
+                            <!-- SVG goes here. E.g.: <svg id="india-svg" viewBox="0 0 1000 1000">...</svg> -->
+                            <div class="map-placeholder-text">
+                                <i data-lucide="map"></i>
+                                <span>Loading India Crime Intelligence Map...</span>
+                            </div>
+                        </div>
+
+                        <!-- Crime Density Legend -->
+                        <div class="map-legend">
+                            <span class="legend-label">Low</span>
+                            <div class="legend-gradient"></div>
+                            <span class="legend-label">Critical</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Side Panels -->
+                    <div class="side-panels col-span-4">
+                        
+                        <!-- State Details Panel -->
+                        <div class="panel glass-panel animate-fade-in delay-3" id="state-details-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">State Intelligence</h3>
+                                <button class="icon-btn"><i data-lucide="external-link"></i></button>
+                            </div>
+                            
+                            <div class="state-details-content">
+                                <!-- Default empty state -->
+                                <div class="selected-state-header">
+                                    <h4 id="detail-state-name" class="empty-data">No Sector Selected</h4>
+                                    <span id="detail-threat-level" class="threat-badge empty-badge">--</span>
+                                </div>
+                                
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Active Incidents</span>
+                                        <span id="detail-incident-count" class="detail-value text-primary">--</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Signal Intercepts</span>
+                                        <span id="detail-signal-count" class="detail-value text-primary">--</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Dominant Vector</span>
+                                        <span id="detail-primary-vector" class="detail-value text-cyan">--</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Asset Deployment</span>
+                                        <span id="detail-asset-status" class="detail-value text-primary">--</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-action">
+                                    <button id="view-state-report-btn" class="btn primary-btn full-width" disabled>
+                                        <i data-lucide="file-text"></i> Generate State Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top States Panel (Chart.js placeholder) -->
+                        <div class="panel glass-panel animate-fade-in delay-4" id="top-states-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">Highest Threat States</h3>
+                                <button class="icon-btn"><i data-lucide="bar-chart-2"></i></button>
+                            </div>
+                            <div class="chart-container list-chart-container">
+                                <!-- Empty chart canvas for injection -->
+                                <canvas id="topStatesChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="bottom-spacer"></div>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <footer class="footer-status-bar glass-panel">
+                <div class="status-left">
+                    <div class="status-item">
+                        <i data-lucide="server"></i> Flask API <span class="highlight">Online</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <i data-lucide="shield-check"></i> NEO4J: <span class="highlight">Connected</span>
+                    </div>
+                </div>
+                
+                <div class="status-right">
+                    <div class="status-item terminal-font">
+                        Sarvam AI <span class="text-success">14ms</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item terminal-font">
+                        SYS_TIME: <span id="sys-time">00:00:00 UTC</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/static/js/map.js"></script>
+</body>
+</html>

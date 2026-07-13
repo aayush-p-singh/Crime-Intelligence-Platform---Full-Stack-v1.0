@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Risk Intelligence Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <canvas id="bg"></canvas>
+    
+    <div class="wrapper">
+        
+        <div class="sidebar">
+            <h1>🚨 Crime Risk Intelligence</h1>
+            <p>AI-powered predictive analytics framework leveraging machine learning risk scores and graph network intelligence for national security indicators.</p>
+            
+            <div class="card">
+                <label for="state">Select Region/State Data Gateway</label>
+                <select id="state">
+                    <option value="">Select State</option>
+                </select>
+                
+                <button onclick="predict()">Analyze Risk Tiers</button>
+            </div>
+        </div>
+
+        <main class="workspace">
+            <div id="placeholderBox" class="placeholder">
+                <h2>No Region Evaluated</h2>
+                <p>Select a specific geographical jurisdiction from the analytical controller dashboard matrix on the left panel to execute an indicator prediction analysis.</p>
+            </div>
+
+            <div id="resultBox" class="result-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="resState">State Analysis Matrix</h3>
+                    <div>
+                        <span style="color: #94a3b8; font-size: 14px; font-weight: 600;">RISK ASSIGNMENT:</span>
+                        <span id="resRisk" class="risk">Evaluation Pending</span>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-title">Crime Index Rate (Per Lakh)</div>
+                        <div id="mRate" class="metric-value">0.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Chargesheet Execution Efficiency</div>
+                        <div id="mChargesheet" class="metric-value">0.0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Total Incidents Evaluated (2022)</div>
+                        <div id="mCrime" class="metric-value">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Women Vulnerability Index Ratio</div>
+                        <div id="mWomenPercent" class="metric-value">0.0%</div>
+                    </div>
+                </div>
+                <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Risk Intelligence Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <canvas id="bg"></canvas>
+    
+    
+    <div class="prediction-card">
+
+    <h3>🔮 Predictive Intelligence</h3>
+
+    <div class="prediction-grid">
+
+        <div class="prediction-stat">
+            <span>Predicted Crime (Next Year)</span>
+            <h2 id="predictedCrime">--</h2>
+        </div>
+
+        <div class="prediction-stat">
+            <span>Growth Forecast</span>
+            <h2 id="predictedGrowth">--</h2>
+        </div>
+
+        <div class="prediction-stat">
+            <span>Trend</span>
+            <h2 id="predictedTrend">--</h2>
+        </div>
+
+        <div class="prediction-stat">
+            <span>Risk Level</span>
+            <h2 id="predictedRisk">--</h2>
+        </div>
+
+    </div>
+
+</div>
+<script>
+const PRESELECTED_STATE = "{{ selected_state or '' }}";
+</script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+                
+                <div class="ai-card">
+                    <h3>🤖 Generative Analytical Recommendation</h3>
+                    <p id="resRecommendation">Executing analytical reasoning models...</p>
+                </div>
+            </div>
+        </main>
+        
+    </div>
+    
+<script>
+
+</script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

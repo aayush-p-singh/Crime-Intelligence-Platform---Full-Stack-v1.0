@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Intelligence Platform</title>
+    
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/home.css') }}">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="brand-text">
+                    <h2>CRIME INTEL</h2>
+                    <span>AI PLATFORM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">Main Command</span>
+                <a href="{{ url_for('home') }}" class="nav-item active">Home</a>
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
+                    <i data-lucide="radio-receiver"></i>
+                    <span>Intel Flow</span>
+                </a>
+                <a href="{{ url_for('map_page') }}" class="nav-item">India Map</a>
+                    <i data-lucide="crosshair"></i>
+                    <span>Threat Matrix</span>
+                </a>
+                
+                <span class="nav-heading">Operations</span>
+                <a href="{{ url_for('compare_page') }}" class="nav-item">State Comparison</a>
+                    <i data-lucide="network"></i>
+                    <span>Asset Tracking</span>
+                </a>
+                <a href="{{ url_for('chat_page') }}" class="nav-item">Intelligence Officer</a>
+                    <i data-lucide="file-warning"></i>
+                    <span>Incident Logs</span>
+                </a>
+                <a href="{{ url_for('graph') }}" class="nav-item">Knowledge Graph</a>
+                    <i data-lucide="settings"></i>
+                    <span>Configuration</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="clearance-badge">
+                    <i data-lucide="fingerprint"></i>
+                    <span>Clearance: Level 5</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="top-navbar glass-panel">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Query Intel Database, IP Addresses, or Threat Signatures...">
+                    <kbd class="kbd-shortcut">⌘K</kbd>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="icon-btn pulse-alert">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">4</span>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="terminal"></i>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="{{ url_for('static', filename='images/admin.png') }}">
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Cmdr. Vance</span>
+                            <span class="user-role">SecOps Lead</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                
+                <section class="hero-section glass-panel animate-fade-in">
+                    <div class="hero-grid">
+                        <div class="hero-text">
+                            <div class="status-chip">
+                                <span class="indicator green"></span>
+                                Global Surveillance Active
+                            </div>
+                            <h1 class="gradient-text">
+                            National Crime Intelligence Platform
+                            </h1>
+                            <p class="hero-subtext">Advanced threat telemetry and autonomous signal intercepts. Operating at maximum capacity across all monitored global sectors.</p>
+                            
+                            <div class="hero-buttons">
+                                <a href="{{ url_for('dashboard') }}" class="btn primary-btn">
+                                <i data-lucide="activity"></i>
+                                Launch Dashboard
+                                </a>
+                                    <i data-lucide="activity"></i>
+                                    Launch Dashboard
+                                </button>
+                                <a href="{{ url_for('chat_page') }}" class="btn secondary-btn glow-effect">
+                                <i data-lucide="cpu"></i>
+                                Ask AI Officer
+                                </a>
+                                    <i data-lucide="cpu"></i>
+                                    Ask AI Officer
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="hero-metrics">
+                            <div class="metric-box">
+                                <span class="metric-label">Signals Intercepted (24h)</span>
+                                <span class="metric-value">1,402,891</span>
+                                <span class="metric-trend positive"><i data-lucide="trending-up"></i> +12.4%</span>
+                            </div>
+                            <div class="metric-box alert-box">
+                                <span class="metric-label">Active Anomalies</span>
+                                <span class="metric-value text-danger">47</span>
+                                <span class="metric-trend negative"><i data-lucide="alert-triangle"></i> Action Required</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="section-header animate-fade-in delay-1">
+                    <h3>Active Intelligence Modules</h3>
+                    <button class="text-btn">View All Modules <i data-lucide="arrow-right"></i></button>
+                </div>
+
+                <section class="modules-grid">
+                    <div class="module-card glass-panel animate-fade-in delay-2">
+                        <div class="card-header">
+                            <div class="card-icon blue"><i data-lucide="globe"></i></div>
+                            <div class="card-actions"><i data-lucide="more-horizontal"></i></div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Global Threat Map</h4>
+                            <p>Real-time visualization of cyber-kinetic threat vectors across monitored geopolitical zones.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="status-text"><span class="dot live"></span> Live Feed</span>
+                            <span class="tech-tag">Geospatial</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card glass-panel animate-fade-in delay-3">
+                        <div class="card-header">
+                            <div class="card-icon purple"><i data-lucide="wifi"></i></div>
+                            <div class="card-actions"><i data-lucide="more-horizontal"></i></div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Signal Intercepts</h4>
+                            <p>Deep-packet inspection and decryption protocols for high-frequency radio and encrypted SATCOM data.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="status-text"><span class="dot processing"></span> Decrypting</span>
+                            <span class="tech-tag">SIGINT</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card glass-panel animate-fade-in delay-4">
+                        <div class="card-header">
+                            <div class="card-icon red"><i data-lucide="scan"></i></div>
+                            <div class="card-actions"><i data-lucide="more-horizontal"></i></div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Anomaly Detection</h4>
+                            <p>AI-driven behavioral analysis engine scanning for unauthorized lateral movement within internal networks.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="status-text danger"><span class="dot critical"></span> 3 Alerts</span>
+                            <span class="tech-tag">Neural Net</span>
+                        </div>
+                    </div>
+
+                    <div class="module-card glass-panel animate-fade-in delay-5">
+                        <div class="card-header">
+                            <div class="card-icon cyan"><i data-lucide="satellite"></i></div>
+                            <div class="card-actions"><i data-lucide="more-horizontal"></i></div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Asset Tracking</h4>
+                            <p>Telemetry mapping and operational status of deployed field agents, drones, and satellite uplinks.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="status-text"><span class="dot live"></span> Synced</span>
+                            <span class="tech-tag">Telemetry</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="bottom-spacer"></div>
+            </div>
+
+            <footer class="footer-status-bar glass-panel">
+                <div class="status-left">
+                    <div class="status-item">
+                        <i data-lucide="server"></i> Mainframe: <span class="highlight">SECURE</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <i data-lucide="shield-check"></i> Encryption: <span class="highlight">AES-256-GCM</span>
+                    </div>
+                </div>
+                
+                <div class="status-right">
+                    <div class="status-item terminal-font">
+                        Uplink Ping: <span class="text-success">14ms</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item terminal-font">
+                        SYS_TIME: <span id="sys-time">00:00:00 UTC</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>
