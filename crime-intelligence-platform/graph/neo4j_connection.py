@@ -1,6 +1,9 @@
 import os
 from neo4j import GraphDatabase
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()  # This forces Python to read your .env file
 
 # Set up logging so we can see errors in the Render dashboard
 logging.basicConfig(level=logging.INFO)
