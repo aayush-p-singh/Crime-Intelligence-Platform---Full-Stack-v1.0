@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from sarvamai import SarvamAI
 
 from services.executive_briefing.formatter import BriefingResponse
+from services.executive_briefing.intelligence_analysis import build_intelligence_metadata
 from services.executive_briefing.llm_client import LLMClient, SarvamTransport
 from services.executive_briefing.logger import log_stage, new_request_id, timed_stage
 from services.executive_briefing.parser import BriefingParser, ExecutiveBriefing
@@ -94,6 +95,10 @@ class ExecutiveBriefingService:
             retrieval_succeeded=retrieval_error is None and bool(articles),
             retrieval_timestamp=retrieved_at,
         )
+        metadata = build_intelligence_metadata(articles, validation.briefing)
+        response.confidence_evidence = metadata["confidenceEvidence"]
+        response.threat_timeline = metadata["threatTimeline"]
+        response.severity_matrix = metadata["severityMatrix"]
         log_stage(request_id, "response", "ready", status=status, warnings=len(validation.warnings))
         return response
 

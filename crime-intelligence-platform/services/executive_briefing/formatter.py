@@ -21,6 +21,9 @@ class BriefingResponse:
     partial: bool = False
     retrieval_succeeded: bool = True
     retrieval_timestamp: str = ""
+    confidence_evidence: dict[str, Any] = field(default_factory=dict)
+    threat_timeline: list[dict[str, Any]] = field(default_factory=list)
+    severity_matrix: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         briefing = self.briefing
@@ -51,4 +54,7 @@ class BriefingResponse:
                 }
                 for article in self.sources
             ],
+            "confidenceEvidence": self.confidence_evidence,
+            "threatTimeline": self.threat_timeline,
+            "severityMatrix": self.severity_matrix,
         }

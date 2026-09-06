@@ -127,6 +127,10 @@ export interface ExecutiveBriefing {
   retrievalTimestamp: string;
   retrievalRequired: boolean;
   retrievalSucceeded: boolean;
+  status?: string;
+  error?: string | null;
+  warnings?: string[];
+  partial?: boolean;
   notice?: string | null;
   sources: Array<{
     title: string;
@@ -134,6 +138,22 @@ export interface ExecutiveBriefing {
     publicationDate?: string | null;
     summary?: string;
     sourceName?: string | null;
+  }>;
+  confidenceEvidence?: {
+    score: number;
+    sourceCount: number;
+    evidenceQuality: string;
+    recency: string;
+    assessment: string;
+  };
+  threatTimeline?: Array<{
+    date: string;
+    events: Array<{ title: string; summary: string; url: string }>;
+  }>;
+  severityMatrix?: Array<{
+    category: string;
+    score: number;
+    evidenceCount: number;
   }>;
 }
 

@@ -97,6 +97,16 @@ function ExecutiveBriefingCard({
 
       {briefing.notice && <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-200">{briefing.notice}</p>}
 
+      {briefing.confidenceEvidence && (
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">Confidence score</p><p className="mt-1 text-xl font-bold text-cyan-300">{briefing.confidenceEvidence.score}/100</p></div>
+          <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">Sources</p><p className="mt-1 text-xl font-bold text-white">{briefing.confidenceEvidence.sourceCount}</p></div>
+          <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">Evidence quality</p><p className="mt-1 text-sm font-bold text-slate-200">{briefing.confidenceEvidence.evidenceQuality}</p></div>
+          <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">Recency</p><p className="mt-1 text-sm font-bold text-slate-200">{briefing.confidenceEvidence.recency}</p></div>
+          <p className="col-span-2 text-xs leading-5 text-slate-400 md:col-span-4">{briefing.confidenceEvidence.assessment}</p>
+        </div>
+      )}
+
       <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
         {BRIEFING_SECTIONS.map(({ key, label }) => {
           const isExpanded = Boolean(expanded[key]);
@@ -113,6 +123,20 @@ function ExecutiveBriefingCard({
       </div>
 
       <div className="mt-5 border-t border-white/10 pt-4">
+        {briefing.severityMatrix && briefing.severityMatrix.length > 0 && (
+          <div className="mb-5">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Intelligence Severity Matrix</h3>
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
+              {briefing.severityMatrix.map((item) => <div key={item.category} className="rounded-lg border border-white/10 bg-slate-950/40 p-3"><div className="flex justify-between gap-2 text-xs text-slate-400"><span>{item.category}</span><strong className={item.score >= 70 ? 'text-red-300' : item.score >= 40 ? 'text-amber-300' : 'text-emerald-300'}>{item.score}</strong></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className={item.score >= 70 ? 'h-full bg-red-400' : item.score >= 40 ? 'h-full bg-amber-400' : 'h-full bg-emerald-400'} style={{ width: `${item.score}%` }} /></div></div>)}
+            </div>
+          </div>
+        )}
+        {briefing.threatTimeline && briefing.threatTimeline.length > 0 && (
+          <div className="mb-5">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Threat Timeline</h3>
+            <div className="space-y-3 border-l border-cyan-500/30 pl-4">{briefing.threatTimeline.map((day) => <div key={day.date}><p className="text-xs font-bold text-cyan-300">{day.date}</p>{day.events.map((event) => <a key={event.url} href={event.url} target="_blank" rel="noreferrer" className="mt-1 block text-xs text-slate-400 hover:text-white"><span className="font-semibold text-slate-200">{event.title}</span><span className="ml-2">{event.summary}</span></a>)}</div>)}</div>
+          </div>
+        )}
         <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Sources Consulted</h3>
         <div className="space-y-2">
           {briefing.sources.length === 0 ? <p className="text-xs text-slate-500">No public sources were verified.</p> : briefing.sources.map((source) => (
