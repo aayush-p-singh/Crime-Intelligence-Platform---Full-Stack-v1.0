@@ -19,22 +19,41 @@ SECTION_NAMES = (
     "Risk Level",
     "Confidence",
 )
-SECTION_PATTERN = re.compile(
-    r"(?im)^\s*(?:[#*]+\s*)?(%s)\s*:\s*\n?"
-    % "|".join(re.escape(name) for name in SECTION_NAMES)
-)
-
-
 def _clean(value: str) -> str:
     return " ".join(value.replace("**", "").split()).strip()
 
 
 def _parse_sections(text: str) -> dict[str, str]:
-    matches = list(SECTION_PATTERN.finditer(text or ""))
     parsed: dict[str, str] = {}
-    for index, match in enumerate(matches):
-        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
-        parsed[match.group(1)] = _clean(text[match.end():end])
+    current_name: str | None = None
+    current_lines: list[str] = []
+
+    def flush() -> None:
+        if current_name is not None:
+            parsed[current_name] = _clean(" ".join(current_lines))
+
+    for line in (text or "").splitlines():
+        normalized = line.strip().strip("#*").strip()
+        matched_name = next(
+            (
+                name
+                for name in SECTION_NAMES
+                if normalized.lower() == name.lower()
+                or normalized.lower().startswith(f"{name.lower()}:")
+            ),
+            None,
+        )
+        if matched_name is None:
+            if current_name is not None:
+                current_lines.append(line)
+            continue
+
+        flush()
+        current_name = matched_name
+        inline_value = normalized[len(matched_name):].lstrip()
+        current_lines = [inline_value[1:].strip()] if inline_value.startswith(":") else []
+
+    flush()
     return parsed
 
 

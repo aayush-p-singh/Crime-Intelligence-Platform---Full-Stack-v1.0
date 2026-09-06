@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import logging
 from typing import Any
 
 from dotenv import load_dotenv
@@ -14,6 +15,7 @@ from services.retrieval.retrieval_service import RetrievalResult, RetrievalServi
 from services.retrieval.source_formatter import format_sources_for_prompt
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 BRIEFING_QUERY = (
@@ -71,10 +73,6 @@ class BriefingService:
                 response = self._ask_sarvam(
                     f"{BRIEFING_PROMPT}\n\nRetrieval notice: {notice}\n\n{fallback_text(notice)}"
                 )
-                print("\n" + "="*80)
-                print("RAW SARVAM RESPONSE:")
-                print(response)
-                print("="*80 + "\n")
             except Exception:
                 response = fallback_text(notice)
             return format_briefing(response, retrieval, notice)
@@ -102,4 +100,6 @@ class BriefingService:
             model="sarvam-105b",
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        logger.info("Executive briefing raw Sarvam response:\n%s", content)
+        return content
