@@ -100,6 +100,22 @@ class BriefingService:
             model="sarvam-105b",
             messages=[{"role": "user", "content": prompt}],
         )
+        response_dump = (
+            response.model_dump()
+            if hasattr(response, "model_dump")
+            else repr(response)
+        )
+        logger.info("Complete Sarvam response: %r", response_dump)
+        if getattr(response, "choices", None):
+            for index, choice in enumerate(response.choices):
+                message = getattr(choice, "message", None)
+                logger.info(
+                    "Sarvam choice %d: finish_reason=%r message=%r message_dump=%r",
+                    index,
+                    getattr(choice, "finish_reason", None),
+                    message,
+                    message.model_dump() if hasattr(message, "model_dump") else repr(message),
+                )
         content = response.choices[0].message.content
         logger.info("Executive briefing raw Sarvam response:\n%s", content)
         return content
