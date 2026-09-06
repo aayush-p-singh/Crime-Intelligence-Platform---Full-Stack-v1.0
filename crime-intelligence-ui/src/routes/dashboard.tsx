@@ -10,6 +10,7 @@ import {
   Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts';
 import { AppShell } from '../components/AppShell';
+import { ExecutiveIntelligenceCenter } from '../components/ExecutiveIntelligenceCenter';
 import { api, type ExecutiveBriefing } from '../lib/api';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
@@ -137,6 +138,7 @@ function ExecutiveBriefingCard({
             <div className="space-y-3 border-l border-cyan-500/30 pl-4">{briefing.threatTimeline.map((day) => <div key={day.date}><p className="text-xs font-bold text-cyan-300">{day.date}</p>{day.events.map((event) => <a key={event.url} href={event.url} target="_blank" rel="noreferrer" className="mt-1 block text-xs text-slate-400 hover:text-white"><span className="font-semibold text-slate-200">{event.title}</span><span className="ml-2">{event.summary}</span></a>)}</div>)}</div>
           </div>
         )}
+        <ExecutiveIntelligenceCenter briefing={briefing} />
         <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Sources Consulted</h3>
         <div className="space-y-2">
           {briefing.sources.length === 0 ? <p className="text-xs text-slate-500">No public sources were verified.</p> : briefing.sources.map((source) => (
