@@ -270,6 +270,11 @@ Write like a professional intelligence officer briefing a senior official.
                 len(enriched_prompt),
             )
             reply = self.ask_llm(enriched_prompt, LIVE_INTELLIGENCE_PROMPT)
+
+            logger.info("=" * 80)
+            logger.info("SARVAM RAW RESPONSE:")
+            logger.info("%s", reply)
+            logger.info("=" * 80)
         elif intent == "COMPARE":
             reply = self.ask_llm(message, COMPARE_PROMPT)
 
