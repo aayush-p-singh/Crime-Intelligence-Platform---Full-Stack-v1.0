@@ -281,6 +281,9 @@ Write like a professional intelligence officer briefing a senior official.
 
         else:
             reply = self.ask_llm(message)
+            print("\n================ SARVAM RAW RESPONSE ================\n")
+            print(reply)
+            print("\n=====================================================\n")
 
         return {
             "reply": reply,
