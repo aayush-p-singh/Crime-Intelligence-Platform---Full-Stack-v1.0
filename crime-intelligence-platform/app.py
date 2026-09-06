@@ -19,7 +19,7 @@ from services.chart_service import ChartService
 from services.crime_tools import CrimeTools
 from services.sarvam_service import generate_recommendation
 from services.crime_officer import officer
-from services.briefing.briefing_service import BriefingService
+from services.executive_briefing.service import create_default_service
 from services.threats.threat_intelligence_service import ThreatIntelligenceService
 
 # ==========================================================
@@ -30,7 +30,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-briefing_service = BriefingService()
+briefing_service = create_default_service()
 threat_intelligence_service = ThreatIntelligenceService()
 from flask import Flask
 from flask_cors import CORS
