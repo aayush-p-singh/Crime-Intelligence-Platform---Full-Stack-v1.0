@@ -1,4 +1,5 @@
 import json
+import logging
 from services.ai.prompts import (
     COMPARE_PROMPT,
     STATE_PROMPT,
@@ -9,7 +10,7 @@ from sarvamai import SarvamAI
 from graph.neo4j_connection import Neo4jConnection
 from services.crime_tools import CrimeTools
 from services.ai.intent_router import router
-from services.retrieval.prompt_builder import build_live_prompt
+from services.retrieval.prompt_builder import LIVE_INTELLIGENCE_PROMPT, build_live_prompt
 from services.retrieval.retrieval_service import RetrievalService
 import os
 
@@ -21,6 +22,7 @@ client = SarvamAI(
 
 db = Neo4jConnection()
 retrieval_service = RetrievalService()
+logger = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT = """
@@ -261,7 +263,13 @@ Write like a professional intelligence officer briefing a senior official.
                 dataset_context=message if message != original_message else None,
                 retrieval_notice=retrieval.notice,
             )
-            reply = self.ask_llm(enriched_prompt)
+            logger.info(
+                "Live retrieval handoff: query=%r sources=%d evidence_chars=%d",
+                original_message,
+                len(retrieval.source_records),
+                len(enriched_prompt),
+            )
+            reply = self.ask_llm(enriched_prompt, LIVE_INTELLIGENCE_PROMPT)
         elif intent == "COMPARE":
             reply = self.ask_llm(message, COMPARE_PROMPT)
 
