@@ -71,6 +71,10 @@ class BriefingService:
                 response = self._ask_sarvam(
                     f"{BRIEFING_PROMPT}\n\nRetrieval notice: {notice}\n\n{fallback_text(notice)}"
                 )
+                print("\n" + "="*80)
+                print("RAW SARVAM RESPONSE:")
+                print(response)
+                print("="*80 + "\n")
             except Exception:
                 response = fallback_text(notice)
             return format_briefing(response, retrieval, notice)
