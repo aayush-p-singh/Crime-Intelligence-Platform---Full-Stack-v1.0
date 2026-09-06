@@ -179,6 +179,65 @@
   to { opacity: 1; transform: scale(1); }
 }
 
+@keyframes boot-fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.015); pointer-events: none; }
+}
+
+@keyframes boot-logo-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 oklch(0.72 0.17 195 / 0.35); }
+  50% { transform: scale(1.06); box-shadow: 0 0 0 12px oklch(0.72 0.17 195 / 0); }
+}
+
+@keyframes boot-grid-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(32px, 32px, 0); }
+}
+
+@keyframes boot-step-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.app-route-enter { animation: page-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #e2e8f0;
+  background: radial-gradient(circle at 50% 42%, rgba(8, 47, 73, 0.62), transparent 44%), #050914;
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+
+.boot-screen-closing { opacity: 0; transform: scale(1.015); pointer-events: none; }
+.boot-grid { position: absolute; inset: -50%; opacity: 0.22; background-image: linear-gradient(rgba(34, 211, 238, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 211, 238, 0.12) 1px, transparent 1px); background-size: 42px 42px; transform: perspective(700px) rotateX(58deg); animation: boot-grid-drift 18s linear infinite; }
+.boot-glow { position: absolute; width: 360px; height: 360px; border-radius: 999px; filter: blur(80px); opacity: 0.16; pointer-events: none; }
+.boot-glow-left { top: -140px; left: -80px; background: #2563eb; }
+.boot-glow-right { right: -120px; bottom: -140px; background: #0891b2; }
+.boot-content { position: relative; width: min(92vw, 520px); padding: 32px 0; text-align: center; }
+.boot-logo-wrap { position: relative; display: inline-grid; place-items: center; margin-bottom: 22px; width: 82px; height: 82px; animation: boot-logo-pulse 2.2s ease-in-out infinite; border: 1px solid rgba(103, 232, 249, 0.45); border-radius: 24px; background: rgba(8, 47, 73, 0.56); }
+.boot-logo-ring { position: absolute; inset: -10px; border: 1px solid rgba(34, 211, 238, 0.18); border-radius: 30px; }
+.boot-logo { width: 42px; height: 42px; color: #67e8f9; filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.7)); }
+.boot-kicker { color: #67e8f9; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; }
+.boot-title { margin-top: 10px; color: #f8fafc; font-family: var(--font-display); font-size: clamp(2.1rem, 8vw, 3.8rem); font-weight: 700; letter-spacing: 0.1em; }
+.boot-subtitle { margin-top: 8px; color: #94a3b8; font-size: 13px; letter-spacing: 0.08em; }
+.boot-sequence { margin: 36px auto 24px; width: min(100%, 420px); text-align: left; }
+.boot-step { display: flex; align-items: center; gap: 10px; min-height: 29px; color: #475569; font-family: var(--font-mono); font-size: 11px; transition: color 220ms ease; }
+.boot-step-current { color: #bae6fd; animation: boot-step-in 260ms ease both; }
+.boot-step-done { color: #86efac; }
+.boot-step-icon { display: grid; place-items: center; width: 17px; height: 17px; flex: 0 0 17px; }
+.boot-step-icon > span { width: 5px; height: 5px; border-radius: 999px; background: #334155; }
+.boot-step-done svg { width: 15px; height: 15px; }
+.boot-spinner { width: 14px; height: 14px; animation: spin 1s linear infinite; color: #67e8f9; }
+.boot-progress-meta { display: flex; justify-content: space-between; color: #64748b; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; }
+.boot-progress-meta strong { color: #67e8f9; font-weight: 500; }
+.boot-progress-track { height: 2px; margin-top: 9px; overflow: hidden; background: rgba(148, 163, 184, 0.15); }
+.boot-progress-fill { height: 100%; background: linear-gradient(90deg, #2563eb, #22d3ee); box-shadow: 0 0 12px rgba(34, 211, 238, 0.75); transition: width 260ms ease; }
+
 @keyframes map-heat-shimmer {
   0%, 100% { opacity: 0.82; filter: saturate(0.95); }
   50% { opacity: 1; filter: saturate(1.2); }
@@ -239,4 +298,5 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+  .boot-screen, .boot-grid, .boot-logo-wrap, .boot-step-current { animation: none !important; }
 }
