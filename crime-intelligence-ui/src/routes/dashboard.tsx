@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { 
   ShieldAlert, TrendingUp, Users, AlertTriangle, 
   Download, Loader2, FileText, MapPin, BrainCircuit, RefreshCw, ChevronDown, ExternalLink, Clock, ShieldCheck
@@ -52,6 +52,24 @@ function riskClasses(riskLevel: string): string {
   return 'text-slate-300 border-white/10 bg-white/5';
 }
 
+function AnimatedSeverityBar({ score, tone }: { score: number; tone: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.35 });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return <div ref={ref} className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className={`h-full ${tone} transition-[width] duration-700 ease-out`} style={{ width: visible ? `${score}%` : '0%' }} /></div>;
+}
+
 function ExecutiveBriefingCard({
   briefing,
   isLoading,
@@ -68,7 +86,11 @@ function ExecutiveBriefingCard({
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ executiveSummary: true });
 
   if (isLoading) {
-    return <div className="rounded-xl border border-white/10 bg-slate-900/50 p-6 text-sm text-slate-400">Compiling executive intelligence brief...</div>;
+    return <div className="intelligence-card rounded-xl border border-white/10 bg-slate-900/50 p-6" aria-label="Loading executive intelligence briefing">
+      <div className="mb-5 flex items-center gap-3"><div className="briefing-skeleton h-10 w-10 rounded-lg" /><div className="space-y-2"><div className="briefing-skeleton h-4 w-64 rounded" /><div className="briefing-skeleton h-3 w-44 rounded" /></div></div>
+      <div className="grid gap-3 md:grid-cols-4">{Array.from({ length: 4 }, (_, index) => <div key={index} className="briefing-skeleton h-16 rounded-lg" />)}</div>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">{Array.from({ length: 4 }, (_, index) => <div key={index} className="briefing-skeleton h-20 rounded-lg" />)}</div>
+    </div>;
   }
 
   if (error || !briefing) {
@@ -76,7 +98,7 @@ function ExecutiveBriefingCard({
   }
 
   return (
-    <section className="rounded-xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-md">
+    <section className="intelligence-card intelligence-card-hover rounded-xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-md page-enter">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-2"><ShieldCheck className="h-5 w-5 text-cyan-300" /></div>
@@ -85,7 +107,7 @@ function ExecutiveBriefingCard({
             <p className="text-xs text-slate-400">Current public-source assessment for decision-makers</p>
           </div>
         </div>
-        <button onClick={onRefresh} disabled={isFetching} className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-50" title="Refresh executive briefing">
+        <button onClick={onRefresh} disabled={isFetching} className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/10 hover:text-cyan-200 active:translate-y-0 disabled:opacity-50" title="Refresh executive briefing">
           <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} /> Refresh
         </button>
       </div>
@@ -109,15 +131,15 @@ function ExecutiveBriefingCard({
       )}
 
       <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
-        {BRIEFING_SECTIONS.map(({ key, label }) => {
+        {BRIEFING_SECTIONS.map(({ key, label }, sectionIndex) => {
           const isExpanded = Boolean(expanded[key]);
           return (
-            <article key={key} className="rounded-lg border border-white/10 bg-slate-950/40">
-              <button onClick={() => setExpanded((current) => ({ ...current, [key]: !isExpanded }))} className="flex w-full items-center justify-between gap-3 p-4 text-left">
+            <article key={key} className="intelligence-card intelligence-card-hover rounded-lg border border-white/10 bg-slate-950/40 page-enter" style={{ animationDelay: `${sectionIndex * 45}ms` }}>
+              <button onClick={() => setExpanded((current) => ({ ...current, [key]: !isExpanded }))} className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-white/5 active:bg-white/10">
                 <span className="text-sm font-semibold text-slate-200">{label}</span>
                 <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
               </button>
-              {isExpanded && <p className="border-t border-white/5 px-4 pb-4 pt-3 text-sm leading-6 text-slate-400">{String(briefing[key])}</p>}
+              <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}><div className="min-h-0 overflow-hidden"><p className="border-t border-white/5 px-4 pb-4 pt-3 text-sm leading-6 text-slate-400">{String(briefing[key])}</p></div></div>
             </article>
           );
         })}
@@ -128,7 +150,7 @@ function ExecutiveBriefingCard({
           <div className="mb-5">
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Intelligence Severity Matrix</h3>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
-              {briefing.severityMatrix.map((item) => <div key={item.category} className="rounded-lg border border-white/10 bg-slate-950/40 p-3"><div className="flex justify-between gap-2 text-xs text-slate-400"><span>{item.category}</span><strong className={item.score >= 70 ? 'text-red-300' : item.score >= 40 ? 'text-amber-300' : 'text-emerald-300'}>{item.score}</strong></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className={item.score >= 70 ? 'h-full bg-red-400' : item.score >= 40 ? 'h-full bg-amber-400' : 'h-full bg-emerald-400'} style={{ width: `${item.score}%` }} /></div></div>)}
+              {briefing.severityMatrix.map((item) => <div key={item.category} className="intelligence-card intelligence-card-hover rounded-lg border border-white/10 bg-slate-950/40 p-3"><div className="flex justify-between gap-2 text-xs text-slate-400"><span>{item.category}</span><strong className={item.score >= 70 ? 'text-red-300' : item.score >= 40 ? 'text-amber-300' : 'text-emerald-300'}>{item.score}</strong></div><AnimatedSeverityBar score={item.score} tone={item.score >= 70 ? 'bg-red-400' : item.score >= 40 ? 'bg-amber-400' : 'bg-emerald-400'} /></div>)}
             </div>
           </div>
         )}
@@ -264,6 +286,8 @@ function DashboardComponent() {
     setIsExporting(true);
     
     try {
+      const briefing = briefingQuery.data;
+      const generatedAt = new Date();
       const dataUrl = await toPng(reportRef.current, {
         quality: 1.0,
         pixelRatio: 2,
@@ -279,63 +303,168 @@ function DashboardComponent() {
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
-      // Banner
-      pdf.setFillColor(220, 38, 38);
-      pdf.rect(0, 0, pageWidth, 8, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('CONFIDENTIAL - AUTHORIZED PERSONNEL ONLY', pageWidth / 2, 5.5, { align: 'center' });
-
-      // Header
-      pdf.setTextColor(15, 23, 42);
-      pdf.setFontSize(16);
-      pdf.text('CRIME INTEL PLATFORM', 15, 20);
-      
-      pdf.setFontSize(9);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Timestamp: ${new Date().toLocaleString()}`, pageWidth - 15, 20, { align: 'right' });
-
-      pdf.setDrawColor(200, 200, 200);
-      pdf.line(15, 24, pageWidth - 15, 24);
-
-      // Snapshot
       const margins = 15;
-      const maxImgWidth = pageWidth - (margins * 2);
-      const imgProps = pdf.getImageProperties(dataUrl);
-      const imgHeight = (imgProps.height * maxImgWidth) / imgProps.width;
-      
-      pdf.addImage(dataUrl, 'PNG', margins, 30, maxImgWidth, imgHeight);
+      const contentWidth = pageWidth - margins * 2;
+      const navy = [15, 23, 42] as const;
+      const cyan = [8, 145, 178] as const;
+      const red = [185, 28, 28] as const;
+      const slate = [71, 85, 105] as const;
+      const lineHeight = 5;
 
-      // Analysis
-      const analysisY = 30 + imgHeight + 15;
-      pdf.setFontSize(12);
+      const writeBlock = (text: string, x: number, y: number, width: number, size = 10) => {
+        pdf.setFontSize(size);
+        pdf.setFont('helvetica', 'normal');
+        const lines = pdf.splitTextToSize(text || 'No verified intelligence available.', width);
+        pdf.text(lines, x, y);
+        return y + lines.length * lineHeight + 4;
+      };
+      const heading = (text: string, y: number) => {
+        pdf.setTextColor(...navy);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(14);
+        pdf.text(text.toUpperCase(), margins, y);
+        pdf.setDrawColor(...cyan);
+        pdf.setLineWidth(0.6);
+        pdf.line(margins, y + 2, pageWidth - margins, y + 2);
+        return y + 10;
+      };
+      const metric = (label: string, value: string, x: number, y: number, width: number) => {
+        pdf.setFillColor(241, 245, 249);
+        pdf.setDrawColor(203, 213, 225);
+        pdf.roundedRect(x, y, width, 20, 2, 2, 'FD');
+        pdf.setTextColor(...slate);
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(label.toUpperCase(), x + 4, y + 7);
+        pdf.setTextColor(...navy);
+        pdf.setFontSize(12);
+        pdf.text(value, x + 4, y + 15);
+      };
+
+      // Cover page.
+      pdf.setFillColor(...navy);
+      pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+      pdf.setFillColor(...red);
+      pdf.rect(0, 0, pageWidth, 10, 'F');
+      pdf.setTextColor(255, 255, 255);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('INTELLIGENCE SUMMARY & DIRECTIVE', margins, analysisY);
-
       pdf.setFontSize(10);
+      pdf.text('CONFIDENTIAL - AUTHORIZED PERSONNEL ONLY', pageWidth / 2, 6.5, { align: 'center' });
+      pdf.setTextColor(103, 232, 249);
+      pdf.setFontSize(11);
+      pdf.text('CRIME INTELLIGENCE PLATFORM', margins, 55);
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(27);
+      pdf.text('Executive Intelligence', margins, 75);
+      pdf.text('Briefing', margins, 88);
+      pdf.setTextColor(148, 163, 184);
       pdf.setFont('helvetica', 'normal');
-      
-      let analysisText = "";
-      if (selectedRegion === 'All') {
-         analysisText = `The national threat landscape currently reflects an average crime rate of ${avgCrimeRate} per lakh. AI Predictive Models forecast a future threat trajectory of [${threatLevel}]. Total logged incidents year-to-date stand at ${totalIncidents.toLocaleString()}. Law enforcement resources and predictive task forces should be strategically deployed to compounding high-priority zones, specifically targeting ${top5CrimeStates[0]?.name || 'key areas'} and ${top5CrimeStates[1]?.name || 'surrounding regions'}. Constant surveillance is recommended to monitor the investigation backlog.`;
-      } else {
-         const stateTarget = activeData[0];
-         if(stateTarget) {
-             analysisText = `Target Region: ${stateTarget.name.toUpperCase()}.\nIntelligence confirms a [${stateTarget.risk.toUpperCase()}] current profile, with AI projecting a future trajectory of [${threatLevel}]. The region has recorded ${stateTarget.totalCrime.toLocaleString()} total incidents with a formal chargesheet filing efficiency of ${stateTarget.chargesheetRate}%. Field operatives and localized rapid-response units are advised to prioritize investigative bottlenecks and focus on high-density threat vectors to improve judicial outcomes.`;
-         }
+      pdf.setFontSize(11);
+      pdf.text('National security analytics report', margins, 101);
+      pdf.text(`Scope: ${selectedRegion === 'All' ? 'National overview' : selectedRegion}`, margins, 115);
+      pdf.text(`Generated: ${generatedAt.toLocaleString()}`, margins, 123);
+      if (briefing) {
+        pdf.setFillColor(30, 41, 59);
+        pdf.roundedRect(margins, 145, contentWidth, 54, 3, 3, 'F');
+        pdf.setTextColor(148, 163, 184);
+        pdf.setFontSize(8);
+        pdf.text('CURRENT INTELLIGENCE POSTURE', margins + 8, 157);
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(22);
+        pdf.text(briefing.riskLevel || 'Unassessed', margins + 8, 173);
+        pdf.setTextColor(103, 232, 249);
+        pdf.setFontSize(11);
+        pdf.text(`Confidence: ${briefing.confidence || 'Unavailable'}`, margins + 8, 188);
       }
 
-      const splitText = pdf.splitTextToSize(analysisText, maxImgWidth);
-      pdf.text(splitText, margins, analysisY + 7);
+      // Executive brief page.
+      pdf.addPage();
+      let y = heading('Executive Intelligence Briefing', 22);
+      if (briefing) {
+        metric('Threat level', briefing.riskLevel || 'Unassessed', margins, y, 42);
+        metric('Confidence', briefing.confidence || 'Unavailable', margins + 47, y, 42);
+        metric('Evidence quality', briefing.confidenceEvidence?.evidenceQuality || 'Unavailable', margins + 94, y, 42);
+        metric('Sources', String(briefing.sources.length), margins + 141, y, 39);
+        y += 30;
+        y = heading('Executive Summary', y);
+        y = writeBlock(briefing.executiveSummary, margins, y, contentWidth);
+        y = heading('Threat Assessment', y);
+        y = writeBlock(briefing.majorNationalThreats, margins, y, contentWidth);
+        y = writeBlock(briefing.majorInternationalThreats, margins, y, contentWidth);
+        y = heading('Recommendations', y + 2);
+        writeBlock(briefing.recommendedActions, margins, y, contentWidth);
+      } else {
+        writeBlock('Executive briefing data was unavailable at export time.', margins, y, contentWidth);
+      }
 
-      // Footer
-      pdf.setFontSize(8);
-      pdf.setTextColor(150, 150, 150);
-      pdf.text('Generated by Crime Intelligence Platform', pageWidth / 2, pageHeight - 10, { align: 'center' });
+      // Threat matrix and timeline page.
+      if (briefing) {
+        pdf.addPage();
+        y = heading('Threat Matrix and Timeline', 22);
+        pdf.setFontSize(9);
+        briefing.severityMatrix?.forEach((item, index) => {
+          const rowY = y + index * 12;
+          pdf.setTextColor(...slate);
+          pdf.text(item.category, margins, rowY);
+          pdf.text(String(item.score), pageWidth - margins - 12, rowY);
+          pdf.setFillColor(226, 232, 240);
+          pdf.roundedRect(margins + 45, rowY - 4, contentWidth - 65, 4, 1, 1, 'F');
+          pdf.setFillColor(item.score >= 70 ? 220 : item.score >= 40 ? 245 : 16, item.score >= 70 ? 38 : item.score >= 40 ? 158 : 185, item.score >= 70 ? 38 : item.score >= 40 ? 11 : 129);
+          pdf.roundedRect(margins + 45, rowY - 4, (contentWidth - 65) * Math.min(item.score / 100, 1), 4, 1, 1, 'F');
+        });
+        y += Math.max((briefing.severityMatrix?.length || 0) * 12 + 10, 28);
+        y = heading('Threat Timeline', y);
+        for (const day of briefing.threatTimeline || []) {
+          if (y > pageHeight - 35) { pdf.addPage(); y = heading('Threat Timeline (continued)', 22); }
+          pdf.setTextColor(...cyan);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(9);
+          pdf.text(day.date, margins, y);
+          y += 6;
+          for (const event of day.events) {
+            y = writeBlock(`• ${event.title}: ${event.summary}`, margins + 4, y, contentWidth - 4, 8);
+            if (y > pageHeight - 30) { pdf.addPage(); y = heading('Threat Timeline (continued)', 22); }
+          }
+        }
+      }
 
-      pdf.save(`Briefing_${selectedRegion}_${new Date().toISOString().split('T')[0]}.pdf`);
+      // Existing dashboard image remains the authoritative charts snapshot.
+      pdf.addPage();
+      y = heading('Charts and Analytics Snapshot', 22);
+      const maxImageHeight = pageHeight - y - 25;
+      const imageProps = pdf.getImageProperties(dataUrl);
+      const imageHeight = Math.min((imageProps.height * contentWidth) / imageProps.width, maxImageHeight);
+      pdf.addImage(dataUrl, 'PNG', margins, y, contentWidth, imageHeight);
+
+      if (briefing) {
+        pdf.addPage();
+        y = heading('Source Intelligence', 22);
+        const publisherCounts = new Map<string, number>();
+        briefing.sources.forEach((source) => publisherCounts.set(source.sourceName || 'Unknown publisher', (publisherCounts.get(source.sourceName || 'Unknown publisher') || 0) + 1));
+        const topPublisher = [...publisherCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+        y = writeBlock(`Most frequent publisher: ${topPublisher?.[0] || 'Unavailable'} (${topPublisher?.[1] || 0} articles)\nEvidence quality: ${briefing.confidenceEvidence?.evidenceQuality || 'Unavailable'}\nRecency: ${briefing.confidenceEvidence?.recency || 'Unavailable'}\nConfidence assessment: ${briefing.confidenceEvidence?.assessment || 'Unavailable'}`, margins, y, contentWidth);
+        y = heading('Sources Consulted', y + 3);
+        for (const source of briefing.sources) {
+          if (y > pageHeight - 30) { pdf.addPage(); y = heading('Sources Consulted (continued)', 22); }
+          y = writeBlock(`${source.title}\n${source.sourceName || 'Unknown publisher'} · ${source.publicationDate || 'Date unavailable'}\n${source.url}`, margins, y, contentWidth, 8);
+        }
+      }
+
+      // Add consistent footer and page numbers after all pages are created.
+      const totalPages = pdf.getNumberOfPages();
+      for (let page = 1; page <= totalPages; page += 1) {
+        pdf.setPage(page);
+        pdf.setDrawColor(203, 213, 225);
+        pdf.setLineWidth(0.2);
+        pdf.line(margins, pageHeight - 16, pageWidth - margins, pageHeight - 16);
+        pdf.setTextColor(...slate);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(7);
+        pdf.text('Crime Intelligence Platform · Confidential', margins, pageHeight - 10);
+        pdf.text(`Page ${page} of ${totalPages}`, pageWidth - margins, pageHeight - 10, { align: 'right' });
+      }
+
+      pdf.save(`Briefing_${selectedRegion}_${generatedAt.toISOString().split('T')[0]}.pdf`);
       
     } catch (err) {
       console.error("CRITICAL PDF EXPORT ERROR:", err);
@@ -360,7 +489,7 @@ function DashboardComponent() {
               className="bg-slate-950 border border-white/20 rounded-lg px-4 py-2 text-sm text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-slate-900 transition-colors"
             >
               <option value="All">National Overview (All Regions)</option>
-              {statesData
+              {[...statesData]
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((state) => (
                   <option key={state.name} value={state.name}>{state.name}</option>

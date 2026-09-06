@@ -50,6 +50,19 @@ const normalizeName = (name: string) => {
     .trim();
 };
 
+function isHighRisk(riskLevel?: string): boolean {
+  return riskLevel === 'Critical' || riskLevel === 'High';
+}
+
+function Sparkline({ values }: { values: number[] }) {
+  if (values.length < 2 || values.every((value) => value === 0)) return <span className="text-xs text-slate-500">Unavailable</span>;
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = max - min || 1;
+  const points = values.map((value, index) => `${(index / (values.length - 1)) * 100},${28 - ((value - min) / range) * 24}`).join(' ');
+  return <svg viewBox="0 0 100 32" className="h-8 w-24" role="img" aria-label="Historical crime trend"><polyline points={points} fill="none" stroke="#22d3ee" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
 // --- Reusable Components ---
 
 function MetricRow({ icon: Icon, label, value, colorClass = "text-white" }: { icon: any, label: string, value: string | number, colorClass?: string }) {
@@ -136,7 +149,7 @@ function IndiaMapComponent() {
 
   return (
     <AppShell title="Geospatial Map" subtitle="Interactive risk and crime distribution analysis.">
-      <div className="p-6 md:p-8 space-y-6 animate-in fade-in duration-500 h-[calc(100vh-100px)] flex flex-col">
+      <div className="min-w-0 p-4 md:p-8 space-y-4 md:space-y-6 animate-in fade-in duration-500 h-[calc(100vh-100px)] flex flex-col">
         
         {/* Controls Header */}
         <div className="flex flex-wrap items-center justify-between bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-lg">
@@ -149,14 +162,14 @@ function IndiaMapComponent() {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
+            <label className="flex min-w-0 items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
               <Search className="h-4 w-4 text-slate-500" />
-              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search state" className="w-28 bg-transparent text-xs text-white outline-none placeholder:text-slate-500" />
+              <input aria-label="Search Indian state" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search state" className="w-24 bg-transparent text-xs text-white outline-none placeholder:text-slate-500 md:w-28" />
             </label>
             <select value={threatFilter} onChange={(event) => setThreatFilter(event.target.value as ThreatFilter)} className="rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-xs text-slate-300 outline-none">
               {THREAT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}
             </select>
-            <button onClick={() => void refetchThreats()} title="Refresh threat intelligence" className="rounded-lg border border-white/10 p-2 text-slate-400 hover:bg-white/5 hover:text-white">
+            <button onClick={() => void refetchThreats()} title="Refresh threat intelligence" aria-label="Refresh threat intelligence" className="rounded-lg border border-white/10 p-2 text-slate-400 transition-all hover:-translate-y-0.5 hover:bg-white/5 hover:text-white active:translate-y-0">
               <RefreshCw className={`h-4 w-4 ${isThreatLoading ? 'animate-spin' : ''}`} />
             </button>
           </div>
@@ -221,6 +234,7 @@ function IndiaMapComponent() {
                           geography={geo}
                           fill={getStateColor(matchedState)}
                           fillOpacity={getThreatOpacity(matchedState)}
+                          className={matchedThreat ? `map-heat-region${isHighRisk(matchedThreat.riskLevel) ? ' map-risk-pulse' : ''}` : undefined}
                           stroke={isSelected ? "#ffffff" : "#334155"}
                           strokeWidth={isSelected ? 1.5 : 0.5}
                           onClick={() => matchedState && setSelectedStateName(matchedState.name)}
@@ -255,6 +269,7 @@ function IndiaMapComponent() {
                     <p className="text-sm text-slate-300 flex justify-between gap-4">
                       <span>Crime Rate:</span><span className="font-bold text-white">{hoveredState.crimeRate}</span>
                     </p>
+                    <p className="mt-2 max-w-xs text-xs leading-relaxed text-slate-400">{findThreat(hoveredState.name)?.recentIntelligence || 'Latest intelligence summary unavailable.'}</p>
                   </div>
                 </div>
               )}
@@ -307,11 +322,13 @@ function IndiaMapComponent() {
                       <span className="rounded-full border px-2 py-1 text-xs font-bold" style={{ color: RISK_COLORS[selectedThreat.riskLevel], borderColor: RISK_COLORS[selectedThreat.riskLevel] }}>Score {selectedThreat.threatScore}</span>
                     </div>
                     <p className="text-xs leading-relaxed text-slate-300">{selectedThreat.executiveSummary}</p>
+                    <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3"><div className="mb-2 flex items-center justify-between"><h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Crime Trend</h4><span className="text-xs font-semibold text-cyan-300">{String(selectedThreat.prediction.trend || 'Unavailable')}</span></div><Sparkline values={[selectedThreat.historicalStatistics.crime2020 || 0, selectedThreat.historicalStatistics.crime2021 || 0, selectedThreat.historicalStatistics.crime2022 || 0]} /></div>
                     <p className="text-xs leading-relaxed text-slate-400">{selectedThreat.threatAssessment}</p>
                     <MetricRow icon={ShieldAlert} label="Confidence" value={selectedThreat.confidence} colorClass="text-cyan-300" />
                     <MetricRow icon={Clock} label="Last updated" value={new Date(selectedThreat.lastUpdated).toLocaleString()} />
                     <MetricRow icon={TrendingUp} label="Predicted trend" value={String(selectedThreat.prediction.trend || 'Unavailable')} colorClass="text-orange-300" />
                     <div><h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Live Intelligence</h4><p className="text-xs leading-relaxed text-slate-400">{selectedThreat.recentIntelligence}</p></div>
+                    <div><h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Latest Briefing Summary</h4><p className="text-xs leading-relaxed text-slate-400">{selectedThreat.recentIntelligence || selectedThreat.executiveSummary}</p></div>
                     <div><h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Cyber Threat Status</h4><p className="text-xs leading-relaxed text-slate-400">{selectedThreat.cyberActivity}</p></div>
                     <div><h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Financial Fraud Status</h4><p className="text-xs leading-relaxed text-slate-400">{selectedThreat.financialFraudActivity}</p></div>
                     <div><h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Emerging Crime Categories</h4><div className="flex flex-wrap gap-2">{selectedThreat.emergingThreats.map((item) => <span key={item} className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2 py-1 text-[11px] text-orange-200">{item}</span>)}</div></div>

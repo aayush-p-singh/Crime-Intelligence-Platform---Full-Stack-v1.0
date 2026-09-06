@@ -36,10 +36,10 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0f1c] text-slate-300 flex overflow-hidden font-sans select-none">
+    <div className="min-h-screen bg-[#0a0f1c] text-slate-300 flex overflow-hidden font-sans">
       
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0d1326] border-r border-white/5 flex flex-col z-20 shadow-2xl">
+      <aside className="hidden lg:flex lg:w-64 shrink-0 bg-[#0d1326] border-r border-white/5 flex-col z-20 shadow-2xl">
         <div className="h-16 flex items-center px-6 border-b border-white/5 bg-[#0a0f1c]">
           <Shield className="h-6 w-6 text-blue-500 mr-3" />
           <div>
@@ -77,23 +77,24 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
       </aside>
 
       {/* Main Content Workspace */}
-      <main className="flex-1 flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-[#0a0f1c] to-[#0a0f1c]">
+      <main className="min-w-0 flex-1 flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-[#0a0f1c] to-[#0a0f1c]">
         
         {/* Header / Topbar */}
-        <header className="h-16 bg-[#0d1326]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 z-10">
+        <header className="sticky top-0 h-16 shrink-0 bg-[#0d1326]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between gap-4 px-4 md:px-6 z-30">
           <div>
-            <h2 className="text-lg font-bold text-white">{title}</h2>
+            <h2 className="truncate text-base md:text-lg font-bold text-white">{title}</h2>
             {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
           </div>
 
           {/* Interactive Topbar Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 md:gap-4">
             
             {/* 1. Interactive Search Bar */}
-            <div className="relative group">
+            <div className="relative group hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
               <input 
                 type="text" 
+                aria-label="Search database"
                 placeholder="Search database..." 
                 className="bg-slate-900 border border-white/10 rounded-full py-1.5 pl-9 pr-10 text-sm text-white focus:ring-1 focus:ring-blue-500 outline-none w-48 transition-all duration-300 focus:w-64 shadow-inner"
               />
@@ -106,6 +107,7 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
             <button 
               className="relative p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors outline-none focus:ring-2 focus:ring-blue-500"
               title="System Alerts"
+              aria-label="System alerts"
             >
               <Bell className="h-4 w-4" />
               <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-pink-500 border-2 border-[#0d1326]"></span>
@@ -114,17 +116,20 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
             {/* 2. AI Assist Quick Route */}
             <button 
               onClick={() => navigate({ to: '/cio' })}
-              className="flex items-center px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 rounded-full text-sm font-medium transition-all outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+              className="flex items-center px-2 md:px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 rounded-full text-sm font-medium transition-all outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
               title="Open Intelligence Officer"
             >
-              <Sparkles className="h-4 w-4 mr-1.5" />
-              AI Assist
+              <Sparkles className="h-4 w-4 md:mr-1.5" />
+              <span className="hidden md:inline">AI Assist</span>
             </button>
 
             {/* 3. Admin Profile & Logout Dropdown */}
             <div className="relative" ref={profileRef}>
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
+                aria-expanded={isProfileOpen}
+                aria-haspopup="menu"
+                aria-label="Open administrator menu"
                 className="flex items-center space-x-3 p-1.5 pr-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-colors outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
               >
                 <div className="h-7 w-7 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center">
@@ -163,7 +168,7 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
         </header>
 
         {/* Page Content Viewport */}
-        <div className="flex-1 overflow-auto relative custom-scrollbar">
+        <div className="min-w-0 flex-1 overflow-auto relative custom-scrollbar">
           {children}
         </div>
         
