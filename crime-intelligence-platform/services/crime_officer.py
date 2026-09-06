@@ -9,6 +9,8 @@ from sarvamai import SarvamAI
 from graph.neo4j_connection import Neo4jConnection
 from services.crime_tools import CrimeTools
 from services.ai.intent_router import router
+from services.retrieval.prompt_builder import build_live_prompt
+from services.retrieval.retrieval_service import RetrievalService
 import os
 
 load_dotenv()
@@ -18,6 +20,7 @@ client = SarvamAI(
 )
 
 db = Neo4jConnection()
+retrieval_service = RetrievalService()
 
 
 SYSTEM_PROMPT = """
@@ -40,14 +43,15 @@ Rules:
 2. Don't immediately jump into crime statistics.
 3. Greet users naturally.
 4. Answer general knowledge normally.
-5. Use NCRB data ONLY when it is supplied.
+5. Use supplied NCRB data when it is available, and use general crime-intelligence knowledge for broader questions.
 6. Never invent crime statistics.
 7. If data is unavailable, say so honestly.
-8. Explain insights instead of only listing numbers.
-9. When comparing states, discuss both strengths and weaknesses.
-10. Keep responses concise unless the user requests detail.
-11. If the user asks follow-up questions, use previous conversation context whenever possible.
-12. You are an assistant first, and a crime analyst second.
+8. For current or time-sensitive claims, explain that they should be verified against a current authoritative source.
+9. Explain insights instead of only listing numbers.
+10. When comparing states, discuss both strengths and weaknesses.
+11. Keep responses concise unless the user requests detail.
+12. If the user asks follow-up questions, use previous conversation context whenever possible.
+13. You are an assistant first, and a crime analyst second.
 """
 
 
@@ -95,16 +99,18 @@ class CrimeOfficer:
     COMPARE_PROMPT = """
 You are CIO (Crime Intelligence Officer).
 
-You are preparing a professional intelligence comparison using VERIFIED NCRB data.
+You are preparing a professional intelligence comparison using supplied NCRB data
+when available, with broader crime-intelligence context when relevant.
 
-The supplied dataset is your ONLY source of information.
+Treat supplied NCRB values as authoritative for those values. You may use general
+knowledge to explain context, causes, implications, prevention, policing,
+technology, cyber crime, scams, advisories, and international developments.
 
 STRICT RULES
 
 - Never invent statistics.
-- Never use outside knowledge.
-- Never explain WHY differences exist.
-- Never discuss politics, economy, literacy, policing, urbanization or social factors.
+- Do not present uncertain or time-sensitive claims as verified facts.
+- Say when a current authoritative source is needed to confirm recent developments.
 - Never repeat statistics unnecessarily.
 
 Your job:
@@ -113,10 +119,6 @@ Your job:
 2. Focus primarily on the metric requested by the user, if provided.
 3. Mention other supplied metrics only as supporting context.
 4. End with one concise takeaway.
-
-If information is unavailable, say:
-
-"The available NCRB dataset does not contain this information."
 
 Maximum 150 words.
 
@@ -225,9 +227,13 @@ Write like a professional intelligence officer briefing a senior official.
     
 
              
-    def chat(self, message):
+    def chat_with_metadata(self, message):
+        """Handle a chatbot request and return the reply plus retrieval metadata."""
 
-        route = router.detect(message)
+        original_message = message
+        retrieval = retrieval_service.retrieve(original_message)
+
+        route = router.detect(original_message)
 
         print(route)
 
@@ -245,20 +251,46 @@ Write like a professional intelligence officer briefing a senior official.
         elif intent == "TOP_STATES":
             message = self.handle_top_states(
             message,
-            route["metric"],
-            route["limit"]
+            route
     )
 
-        if intent == "COMPARE":
-            return self.ask_llm(message, COMPARE_PROMPT)
+        if retrieval.required:
+            enriched_prompt = build_live_prompt(
+                question=original_message,
+                sources=retrieval.source_records,
+                dataset_context=message if message != original_message else None,
+                retrieval_notice=retrieval.notice,
+            )
+            reply = self.ask_llm(enriched_prompt)
+        elif intent == "COMPARE":
+            reply = self.ask_llm(message, COMPARE_PROMPT)
 
         elif intent == "STATE_DATA":
-            return self.ask_llm(message, STATE_PROMPT)
+            reply = self.ask_llm(message, STATE_PROMPT)
 
         elif intent == "TOP_STATES":
-            return self.ask_llm(message, TOP_STATES_PROMPT)
+            reply = self.ask_llm(message, TOP_STATES_PROMPT)
 
-        return self.ask_llm(message)
+        else:
+            reply = self.ask_llm(message)
+
+        return {
+            "reply": reply,
+            "retrieval": {
+                "required": retrieval.required,
+                "succeeded": retrieval.succeeded,
+                "query": retrieval.query,
+                "retrievedAt": retrieval.retrieved_at,
+                "confidence": retrieval.confidence,
+                "sources": retrieval.sources,
+                "notice": retrieval.notice,
+            },
+        }
+
+    def chat(self, message):
+        """Backward-compatible string response for existing internal callers."""
+
+        return self.chat_with_metadata(message)["reply"]
     def generate_dashboard_insight(self, state, metric):
 
         data = CrimeTools.get_state_data(state)

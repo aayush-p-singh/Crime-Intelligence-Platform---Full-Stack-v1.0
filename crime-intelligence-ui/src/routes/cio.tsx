@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { AppShell } from '../components/AppShell';
 import { api } from '../lib/api';
-import { Send, Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Loader2, AlertCircle, RefreshCw, ExternalLink, Calendar, Clock } from 'lucide-react';
 
 // --- Types ---
 type Role = 'user' | 'ai';
@@ -13,6 +13,23 @@ interface ChatMessage {
   role: Role;
   content: string;
   isError?: boolean;
+  retrieval?: RetrievalMetadata;
+}
+
+interface RetrievedSource {
+  title: string;
+  url: string;
+  publicationDate?: string | null;
+  sourceName?: string | null;
+}
+
+interface RetrievalMetadata {
+  required: boolean;
+  succeeded: boolean;
+  retrievedAt: string;
+  confidence: string;
+  sources: RetrievedSource[];
+  notice?: string | null;
 }
 
 const SUGGESTED_PROMPTS = [
@@ -64,6 +81,33 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             <span className="whitespace-pre-wrap break-words font-sans">{message.content}</span>
           </div>
         </div>
+        {message.retrieval?.required && (
+          <div className="ml-10 border-l border-white/10 pl-3 text-xs text-slate-400 space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="uppercase tracking-wider text-slate-500">Live sources</span>
+              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-emerald-300">
+                {message.retrieval.confidence} confidence
+              </span>
+              <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {new Date(message.retrieval.retrievedAt).toLocaleString()}</span>
+            </div>
+            {message.retrieval.notice && <p className="text-amber-300">{message.retrieval.notice}</p>}
+            {message.retrieval.sources.map((source) => (
+              <a
+                key={`${source.url}-${source.title}`}
+                href={source.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-start gap-2 text-slate-300 hover:text-white"
+              >
+                <ExternalLink className="mt-0.5 h-3 w-3 flex-shrink-0" />
+                <span>
+                  <span className="block">{source.title}</span>
+                  <span className="flex items-center gap-1 text-[11px] text-slate-500"><Calendar className="h-3 w-3" /> {source.publicationDate ? new Date(source.publicationDate).toLocaleDateString() : 'Date unavailable'}{source.sourceName ? ` · ${source.sourceName}` : ''}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -98,7 +142,8 @@ function CIOComponent() {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'ai',
-        content: data.reply
+        content: data.reply,
+        retrieval: data.retrieval,
       }]);
     },
     onError: (error: any) => {

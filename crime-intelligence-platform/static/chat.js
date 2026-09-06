@@ -2,7 +2,7 @@ async function sendMessage() {
 
     const input = document.getElementById("messageInput");
 
-    const messages = document.getElementById("messages");
+    const messages = document.getElementById("messages") || document.getElementById("chat-feed");
 
     const message = input.value.trim();
 
@@ -14,7 +14,7 @@ async function sendMessage() {
 
             <strong>You</strong>
 
-            <p>${message}</p>
+            <p>${escapeHtml(message)}</p>
 
         </div>
 
@@ -46,13 +46,29 @@ async function sendMessage() {
 
         const data = await response.json();
 
+        const retrieval = data.retrieval;
+        const sources = retrieval && retrieval.required ? `
+            <div class="retrieval-meta">
+                <strong>Live sources</strong>
+                <span>${escapeHtml(retrieval.confidence)} confidence</span>
+                <span>Retrieved ${escapeHtml(new Date(retrieval.retrievedAt).toLocaleString())}</span>
+                ${retrieval.notice ? `<p>${escapeHtml(retrieval.notice)}</p>` : ""}
+                ${(retrieval.sources || []).map(source => `
+                    <a href="${escapeAttribute(source.url)}" target="_blank" rel="noreferrer">
+                        ${escapeHtml(source.title)}${source.publicationDate ? ` (${escapeHtml(new Date(source.publicationDate).toLocaleDateString())})` : ""}
+                    </a>
+                `).join("")}
+            </div>
+        ` : "";
+
         messages.innerHTML += `
 
             <div class="ai-message">
 
                 <strong>Officer</strong>
 
-                <p>${data.reply}</p>
+                <p>${escapeHtml(data.reply)}</p>
+                ${sources}
 
             </div>
 
@@ -84,6 +100,20 @@ async function sendMessage() {
 
     }
 
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;"
+    }[character]));
+}
+
+function escapeAttribute(value) {
+    return escapeHtml(value);
 }
 
 document

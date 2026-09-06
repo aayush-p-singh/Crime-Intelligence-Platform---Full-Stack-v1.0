@@ -1,0 +1,20 @@
+* [33ma67a5c0[m[33m ([m[1;32mcodex/inspect-repository-architecture[m[33m)[m feat(intelligence): add RecommendationCapability adapter
+* [33m6aa05a2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m commit
+* [33mdf8c858[m[33m ([m[1;31morigin/main[m[33m)[m api.ts problem FIXED
+* [33m3eed29f[m .env dormant
+* [33m2bf5b5e[m VITE_API_URL_FIXED
+* [33m69bc3cd[m .env fixed
+* [33m01131d5[m Frontend Deployed
+* [33m31f5224[m commit
+* [33ma5c3fa4[m Neo --init--
+* [33m1087e59[m Render Link
+* [33m1fef091[m commit
+* [33mdfe979a[m Fixed missing sarvamai discrepency
+* [33m4ceb421[m fix: added missing neo4j dependency
+* [33m0cabc5f[m fix: added missing dotenv dependency
+* [33madf57c3[m fix: added missing pandas dependency
+* [33m40f27e2[m fix: added missing pandas dependency
+* [33m0781f5c[m fix: removed submodule and added actual backend files
+* [33m7a6f135[m feat: integrated Random Forest AI predictive threat engine into dashboard
+* [33m38638da[m feat: unified frontend and backend into master repository, added PDF generation
+* [33md017f89[m Finalized Crime Intelligence Platform - Full Stack v1.0

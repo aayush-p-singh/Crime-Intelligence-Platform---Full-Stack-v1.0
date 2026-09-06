@@ -3,14 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useRef, useState, useMemo } from 'react';
 import { 
   ShieldAlert, TrendingUp, Users, AlertTriangle, 
-  Download, Loader2, FileText, MapPin, BrainCircuit
+  Download, Loader2, FileText, MapPin, BrainCircuit, RefreshCw, ChevronDown, ExternalLink, Clock, ShieldCheck
 } from 'lucide-react';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts';
 import { AppShell } from '../components/AppShell';
-import { api } from '../lib/api';
+import { api, type ExecutiveBriefing } from '../lib/api';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 
@@ -30,6 +30,100 @@ function KPICard({ title, value, icon: Icon, trend, trendColor = "text-emerald-4
         {trend && <span className={`text-xs font-medium ${trendColor}`}>{trend}</span>}
       </div>
     </div>
+  );
+}
+
+const BRIEFING_SECTIONS: Array<{ key: keyof ExecutiveBriefing; label: string }> = [
+  { key: 'executiveSummary', label: 'Executive Summary' },
+  { key: 'majorNationalThreats', label: 'Major National Threats' },
+  { key: 'majorInternationalThreats', label: 'Major International Threats' },
+  { key: 'cybercrimeUpdates', label: 'Cybercrime Updates' },
+  { key: 'financialFraudUpdates', label: 'Financial Fraud Updates' },
+  { key: 'emergingCrimeTrends', label: 'Emerging Crime Trends' },
+  { key: 'recommendedActions', label: 'Recommended Actions' },
+];
+
+function riskClasses(riskLevel: string): string {
+  const risk = riskLevel.toLowerCase();
+  if (risk.includes('critical') || risk.includes('high')) return 'text-red-400 border-red-500/30 bg-red-500/10';
+  if (risk.includes('moderate') || risk.includes('medium')) return 'text-amber-300 border-amber-500/30 bg-amber-500/10';
+  if (risk.includes('low')) return 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10';
+  return 'text-slate-300 border-white/10 bg-white/5';
+}
+
+function ExecutiveBriefingCard({
+  briefing,
+  isLoading,
+  isFetching,
+  error,
+  onRefresh,
+}: {
+  briefing?: ExecutiveBriefing;
+  isLoading: boolean;
+  isFetching: boolean;
+  error: unknown;
+  onRefresh: () => void;
+}) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({ executiveSummary: true });
+
+  if (isLoading) {
+    return <div className="rounded-xl border border-white/10 bg-slate-900/50 p-6 text-sm text-slate-400">Compiling executive intelligence brief...</div>;
+  }
+
+  if (error || !briefing) {
+    return <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">Executive briefing is temporarily unavailable. Existing dashboard analytics remain available.</div>;
+  }
+
+  return (
+    <section className="rounded-xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-md">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-2"><ShieldCheck className="h-5 w-5 text-cyan-300" /></div>
+          <div>
+            <h2 className="text-lg font-bold text-white">Executive Intelligence Briefing</h2>
+            <p className="text-xs text-slate-400">Current public-source assessment for decision-makers</p>
+          </div>
+        </div>
+        <button onClick={onRefresh} disabled={isFetching} className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-50" title="Refresh executive briefing">
+          <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} /> Refresh
+        </button>
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-3 text-xs">
+        <span className={`rounded-full border px-3 py-1 font-bold uppercase tracking-wider ${riskClasses(briefing.riskLevel)}`}>Risk: {briefing.riskLevel}</span>
+        <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-blue-200">Confidence: {briefing.confidence}</span>
+        <span className="flex items-center gap-1 text-slate-500"><Clock className="h-3 w-3" /> Updated {new Date(briefing.retrievalTimestamp).toLocaleString()}</span>
+      </div>
+
+      {briefing.notice && <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-200">{briefing.notice}</p>}
+
+      <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+        {BRIEFING_SECTIONS.map(({ key, label }) => {
+          const isExpanded = Boolean(expanded[key]);
+          return (
+            <article key={key} className="rounded-lg border border-white/10 bg-slate-950/40">
+              <button onClick={() => setExpanded((current) => ({ ...current, [key]: !isExpanded }))} className="flex w-full items-center justify-between gap-3 p-4 text-left">
+                <span className="text-sm font-semibold text-slate-200">{label}</span>
+                <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
+              {isExpanded && <p className="border-t border-white/5 px-4 pb-4 pt-3 text-sm leading-6 text-slate-400">{String(briefing[key])}</p>}
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="mt-5 border-t border-white/10 pt-4">
+        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Sources Consulted</h3>
+        <div className="space-y-2">
+          {briefing.sources.length === 0 ? <p className="text-xs text-slate-500">No public sources were verified.</p> : briefing.sources.map((source) => (
+            <a key={`${source.url}-${source.title}`} href={source.url} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-xs text-slate-300 hover:text-white">
+              <ExternalLink className="mt-0.5 h-3 w-3 flex-shrink-0" />
+              <span>{source.title}<span className="ml-2 text-slate-500">{source.publicationDate ? new Date(source.publicationDate).toLocaleDateString() : 'Date unavailable'}{source.sourceName ? ` · ${source.sourceName}` : ''}</span></span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -124,6 +218,12 @@ function DashboardComponent() {
       });
     },
     enabled: activeData.length > 0, // Only run when we have data
+  });
+
+  const briefingQuery = useQuery({
+    queryKey: ['executive-briefing'],
+    queryFn: api.getExecutiveBriefing,
+    staleTime: 5 * 60 * 1000,
   });
 
   const threatLevel = forecastData?.forecasted_threat_level?.toUpperCase() || "ANALYZING";
@@ -250,6 +350,16 @@ function DashboardComponent() {
             {isExporting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
             {isExporting ? 'Generating Briefing...' : 'Export Briefing'}
           </button>
+        </div>
+
+        <div className="mb-6">
+          <ExecutiveBriefingCard
+            briefing={briefingQuery.data}
+            isLoading={briefingQuery.isLoading}
+            isFetching={briefingQuery.isFetching}
+            error={briefingQuery.error}
+            onRefresh={() => void briefingQuery.refetch()}
+          />
         </div>
 
         <div ref={reportRef} className="space-y-6 pb-4 bg-[#0a0f1c] p-2 rounded-xl">

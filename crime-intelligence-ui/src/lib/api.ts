@@ -48,6 +48,29 @@ export interface StateData {
   risk?: string;
 }
 
+export type ThreatFilter = 'overallThreat' | 'cybercrime' | 'womenSafety' | 'financialFraud' | 'organizedCrime' | 'propertyCrime' | 'violentCrime' | 'emergingCrimes';
+
+export interface ThreatStateAssessment {
+  name: string;
+  riskLevel: 'Low' | 'Guarded' | 'Elevated' | 'High' | 'Critical';
+  threatScore: number;
+  confidence: string;
+  lastUpdated: string;
+  historicalStatistics: Record<string, number>;
+  prediction: Record<string, string | number>;
+  recentIntelligence: string;
+  cyberActivity: string;
+  financialFraudActivity: string;
+  emergingThreats: string[];
+  executiveSummary: string;
+  threatAssessment: string;
+  policeRecommendations: string[];
+  citizenRecommendations: string[];
+  recentHeadlines: Array<{ title: string; url: string; publicationDate?: string | null; sourceName?: string | null; summary?: string }>;
+  supportingSources: Array<{ title: string; url: string; publicationDate?: string | null; sourceName?: string | null; summary?: string }>;
+  categoryScores: Record<ThreatFilter, number>;
+}
+
 export interface ForecastRequest {
   Crime_Rate_2022: number;
   Women_Crimes_2022: number;
@@ -74,6 +97,44 @@ export interface OfficerMessageRequest {
 
 export interface OfficerReply {
   reply: string;
+  retrieval?: {
+    required: boolean;
+    succeeded: boolean;
+    query: string;
+    retrievedAt: string;
+    confidence: string;
+    sources: Array<{
+      title: string;
+      url: string;
+      publicationDate?: string | null;
+      summary?: string;
+      sourceName?: string | null;
+    }>;
+    notice?: string | null;
+  };
+}
+
+export interface ExecutiveBriefing {
+  executiveSummary: string;
+  majorNationalThreats: string;
+  majorInternationalThreats: string;
+  cybercrimeUpdates: string;
+  financialFraudUpdates: string;
+  emergingCrimeTrends: string;
+  recommendedActions: string;
+  riskLevel: string;
+  confidence: string;
+  retrievalTimestamp: string;
+  retrievalRequired: boolean;
+  retrievalSucceeded: boolean;
+  notice?: string | null;
+  sources: Array<{
+    title: string;
+    url: string;
+    publicationDate?: string | null;
+    summary?: string;
+    sourceName?: string | null;
+  }>;
 }
 
 // --- Core Fetch Utility ---
@@ -121,6 +182,8 @@ export const api = {
   // State & Map APIs
   getStates: () => apiFetch<string[]>('/states'),
   getMapData: () => apiFetch<StateData[]>('/map-data'),
+  getThreatIntelligence: () => apiFetch<ThreatStateAssessment[]>('/api/threat-intelligence'),
+  getStateThreatIntelligence: (state: string) => apiFetch<ThreatStateAssessment>(`/api/threat-intelligence/${encodeURIComponent(state)}`),
   getStateDetails: (state: string) => apiFetch<StateData>(`/api/state/${encodeURIComponent(state)}`),
   compareStates: (state1: string, state2: string) => 
     apiFetch<ComparisonData>(`/compare/${encodeURIComponent(state1)}/${encodeURIComponent(state2)}`),
@@ -135,6 +198,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  getExecutiveBriefing: () => apiFetch<ExecutiveBriefing>('/api/executive-briefing'),
 
 // AI Forecasting
   getThreatForecast: (data: ForecastRequest) => 

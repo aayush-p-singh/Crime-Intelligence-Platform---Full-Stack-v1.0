@@ -19,6 +19,8 @@ from services.chart_service import ChartService
 from services.crime_tools import CrimeTools
 from services.sarvam_service import generate_recommendation
 from services.crime_officer import officer
+from services.briefing.briefing_service import BriefingService
+from services.threats.threat_intelligence_service import ThreatIntelligenceService
 
 # ==========================================================
 # Flask Initialization
@@ -27,6 +29,9 @@ from flask import Flask
 from flask_cors import CORS
 
 app = Flask(__name__)
+
+briefing_service = BriefingService()
+threat_intelligence_service = ThreatIntelligenceService()
 from flask import Flask
 from flask_cors import CORS
 
@@ -101,6 +106,21 @@ def map_data():
             output.append({"name": r["name"], "risk": str(risk)})
     return jsonify(output)
 
+@app.route("/api/threat-intelligence", methods=["GET"])
+def threat_intelligence_overview():
+    """Return additive live threat assessments for the national map."""
+
+    return jsonify(threat_intelligence_service.get_overview())
+
+@app.route("/api/threat-intelligence/<state_name>", methods=["GET"])
+def threat_intelligence_state(state_name):
+    """Return detailed additive intelligence for one state."""
+
+    assessment = threat_intelligence_service.get_state(state_name)
+    if assessment is None:
+        return jsonify({"error": "State not found"}), 404
+    return jsonify(assessment)
+
 @app.route("/compare/<state1>/<state2>")
 def compare_states(state1, state2):
     if not db: return jsonify([])
@@ -118,8 +138,13 @@ def compare_states(state1, state2):
 def officer_chat():
     # (Kept your logic, just ensured it's an API route)
     data = request.json
-    reply = officer.chat(data.get("message", ""))
-    return jsonify({"reply": reply})
+    return jsonify(officer.chat_with_metadata(data.get("message", "")))
+
+@app.route("/api/executive-briefing", methods=["GET"])
+def executive_briefing():
+    """Return the current executive intelligence briefing."""
+
+    return jsonify(briefing_service.generate().to_dict())
 
 @app.route("/api/dashboard/crime-rate")
 def crime_rate_chart(): return jsonify(CrimeTools.get_top_states("crimeRate", 10))
