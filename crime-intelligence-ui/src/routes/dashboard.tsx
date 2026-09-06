@@ -17,9 +17,36 @@ import jsPDF from 'jspdf';
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
 
+function formatRelativeTime(milliseconds: number): string {
+  const seconds = Math.max(0, Math.floor(milliseconds / 1000));
+  if (seconds < 10) return 'just now';
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  return `${Math.floor(minutes / 60)}h ago`;
+}
+
+function AnimatedMetric({ value }: { value: string | number }) {
+  const numeric = typeof value === 'number' ? value : Number(String(value).replace(/,/g, ''));
+  const [display, setDisplay] = useState(Number.isFinite(numeric) ? 0 : value);
+  useEffect(() => {
+    if (!Number.isFinite(numeric)) return;
+    let frame = 0;
+    const started = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min((now - started) / 720, 1);
+      setDisplay(Math.round(numeric * (1 - Math.pow(1 - progress, 3))).toLocaleString());
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [numeric]);
+  return <>{display}</>;
+}
+
 function KPICard({ title, value, icon: Icon, trend, trendColor = "text-emerald-400" }: { title: string, value: string | number, icon: any, trend?: string, trendColor?: string }) {
   return (
-    <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 p-6 rounded-xl shadow-lg transition-all duration-300">
+    <div title={`${title}: ${value}`} className="intelligence-card intelligence-card-hover bg-slate-900/50 backdrop-blur-md border border-white/10 p-6 rounded-xl shadow-lg">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-slate-400">{title}</h3>
         <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -27,7 +54,7 @@ function KPICard({ title, value, icon: Icon, trend, trendColor = "text-emerald-4
         </div>
       </div>
       <div className="flex items-baseline space-x-2">
-        <span className="text-2xl font-bold text-white">{value}</span>
+        <span className="text-2xl font-bold text-white"><AnimatedMetric value={value} /></span>
         {trend && <span className={`text-xs font-medium ${trendColor}`}>{trend}</span>}
       </div>
     </div>
@@ -84,6 +111,25 @@ function ExecutiveBriefingCard({
   onRefresh: () => void;
 }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ executiveSummary: true });
+  const [refreshStartedAt, setRefreshStartedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isFetching) {
+      setRefreshStartedAt(null);
+      return;
+    }
+    setRefreshStartedAt(Date.now());
+  }, [isFetching]);
+
+  const relativeUpdated = briefing?.retrievalTimestamp
+    ? formatRelativeTime(now - new Date(briefing.retrievalTimestamp).getTime())
+    : 'Awaiting synchronization';
 
   if (isLoading) {
     return <div className="intelligence-card rounded-xl border border-white/10 bg-slate-900/50 p-6" aria-label="Loading executive intelligence briefing">
@@ -97,6 +143,9 @@ function ExecutiveBriefingCard({
     return <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">Executive briefing is temporarily unavailable. Existing dashboard analytics remain available.</div>;
   }
 
+  const refreshSteps = ['Collecting evidence', 'Cross-validating sources', 'Computing threat score', 'Generating executive briefing'];
+  const refreshProgress = refreshStartedAt ? Math.min(Math.floor((now - refreshStartedAt) / 650), refreshSteps.length - 1) : 0;
+
   return (
     <section className="intelligence-card intelligence-card-hover rounded-xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-md page-enter">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -107,7 +156,7 @@ function ExecutiveBriefingCard({
             <p className="text-xs text-slate-400">Current public-source assessment for decision-makers</p>
           </div>
         </div>
-        <button onClick={onRefresh} disabled={isFetching} className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/10 hover:text-cyan-200 active:translate-y-0 disabled:opacity-50" title="Refresh executive briefing">
+        <button onClick={onRefresh} disabled={isFetching} className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/10 hover:text-cyan-200 active:translate-y-0 disabled:opacity-50" title="Refresh executive briefing" aria-label="Refresh executive briefing">
           <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} /> Refresh
         </button>
       </div>
@@ -115,8 +164,11 @@ function ExecutiveBriefingCard({
       <div className="mt-5 flex flex-wrap items-center gap-3 text-xs">
         <span className={`rounded-full border px-3 py-1 font-bold uppercase tracking-wider ${riskClasses(briefing.riskLevel)}`}>Risk: {briefing.riskLevel}</span>
         <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-blue-200">Confidence: {briefing.confidence}</span>
-        <span className="flex items-center gap-1 text-slate-500"><Clock className="h-3 w-3" /> Updated {new Date(briefing.retrievalTimestamp).toLocaleString()}</span>
+        <span title={`Last updated ${new Date(briefing.retrievalTimestamp).toLocaleString()}`} className="flex items-center gap-2 text-slate-400"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]" /> LIVE <span className="text-slate-500">· updated {relativeUpdated}</span></span>
+        <span className="text-slate-500">{briefing.sources.length} active sources · feeds synchronized</span>
       </div>
+
+      {isFetching && <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3" role="status" aria-live="polite"><p className="text-xs font-semibold text-cyan-200">Analyzing intelligence...</p><div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">{refreshSteps.map((step, index) => <span key={step} className={`text-[11px] ${index <= refreshProgress ? 'text-emerald-300' : 'text-slate-500'}`}>{index <= refreshProgress ? '✓' : '○'} {step}</span>)}</div></div>}
 
       {briefing.notice && <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-200">{briefing.notice}</p>}
 
