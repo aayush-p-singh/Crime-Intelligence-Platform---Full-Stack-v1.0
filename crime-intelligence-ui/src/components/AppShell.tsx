@@ -36,15 +36,15 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0f1c] text-slate-300 flex overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#060606] text-white flex overflow-hidden font-sans">
       
       {/* Sidebar */}
-      <aside className="hidden lg:flex lg:w-64 shrink-0 bg-[#0d1326] border-r border-white/5 flex-col z-20 shadow-2xl">
-        <div className="h-16 flex items-center px-6 border-b border-white/5 bg-[#0a0f1c]">
-          <Shield className="h-6 w-6 text-blue-500 mr-3" />
+      <aside className="hidden lg:flex lg:w-64 shrink-0 bg-[#050505] border-r border-[#1e2229] flex-col z-20 shadow-lg">
+        <div className="h-16 flex items-center px-6 border-b border-[#1e2229] bg-[#050505]">
+          <Shield className="h-6 w-6 text-[#b6bdc9] mr-3" />
           <div>
             <h1 className="text-sm font-black text-white tracking-widest uppercase">Crime Intel</h1>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">AI Platform</p>
+            <p className="text-[10px] font-bold text-[#7e8795] uppercase tracking-widest">Classified Platform</p>
           </div>
         </div>
         
@@ -57,30 +57,30 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
                 to={item.path}
                 className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive 
-                    ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-inner' 
-                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    ? 'bg-transparent text-white border border-transparent border-l-2 border-l-[#345e8c] shadow-none' 
+                    : 'text-[#7e8795] hover:text-white hover:bg-[#1a1d23] border border-transparent'
                 }`}
               >
-                <item.icon className={`h-4 w-4 mr-3 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                <item.icon className={`h-4 w-4 mr-3 ${isActive ? 'text-[#8daed1]' : 'text-[#7e8795]'}`} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
         
-        <div className="p-4 border-t border-white/5">
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 flex items-center">
+        <div className="p-4 border-t border-[#1e2229]">
+          <div className="bg-[#111317] border border-[#2a2e36] rounded p-3 flex items-center">
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse mr-2"></div>
-            <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">AI Engine Active</span>
+            <span className="text-xs font-semibold text-[#2fbf71] uppercase tracking-wider">System Active</span>
           </div>
         </div>
       </aside>
 
       {/* Main Content Workspace */}
-      <main className="min-w-0 flex-1 flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-[#0a0f1c] to-[#0a0f1c]">
+      <main className="min-w-0 flex-1 flex flex-col relative overflow-hidden bg-[#101114]">
         
         {/* Header / Topbar */}
-        <header className="sticky top-0 h-16 shrink-0 bg-[#0d1326]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between gap-4 px-4 md:px-6 z-30">
+        <header className="sticky top-0 h-16 shrink-0 bg-[#050505] border-b border-[#1e2229] flex items-center justify-between gap-4 px-4 md:px-6 z-30">
           <div>
             <h2 className="truncate text-base md:text-lg font-bold text-white">{title}</h2>
             {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
@@ -91,21 +91,21 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
             
             {/* 1. Interactive Search Bar */}
             <div className="relative group hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-white transition-colors" />
               <input 
                 type="text" 
                 aria-label="Search database"
                 placeholder="Search database..." 
-                className="bg-slate-900 border border-white/10 rounded-full py-1.5 pl-9 pr-10 text-sm text-white focus:ring-1 focus:ring-blue-500 outline-none w-48 transition-all duration-300 focus:w-64 shadow-inner"
+                className="bg-[#111317] border border-[#2a2e36] rounded py-1.5 pl-9 pr-10 text-sm text-white focus:ring-1 focus:ring-[#345e8c] outline-none w-48 transition-all duration-300 focus:w-64"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1 pointer-events-none">
-                <kbd className="bg-white/10 border border-white/20 text-slate-400 rounded px-1.5 text-[10px] font-mono">⌘K</kbd>
+                <kbd className="bg-white/10 border border-white/20 text-slate-300 rounded px-1.5 text-[10px] font-mono">⌘K</kbd>
               </div>
             </div>
 
             {/* Notifications */}
             <button 
-              className="relative p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors outline-none focus:ring-2 focus:ring-blue-500"
+              className="relative p-2 text-[#b6bdc9] hover:text-white hover:bg-[#1a1d23] rounded transition-colors outline-none focus:ring-2 focus:ring-[#345e8c]"
               title="System Alerts"
               aria-label="System alerts"
             >
@@ -116,7 +116,7 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
             {/* 2. AI Assist Quick Route */}
             <button 
               onClick={() => navigate({ to: '/cio' })}
-              className="flex items-center px-2 md:px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 rounded-full text-sm font-medium transition-all outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+              className="flex items-center px-2 md:px-3 py-1.5 bg-[#183a66] hover:bg-[#1a1d23] border border-[#345e8c] text-white rounded text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-[#345e8c]"
               title="Open Intelligence Officer"
             >
               <Sparkles className="h-4 w-4 md:mr-1.5" />
@@ -130,24 +130,24 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
                 aria-expanded={isProfileOpen}
                 aria-haspopup="menu"
                 aria-label="Open administrator menu"
-                className="flex items-center space-x-3 p-1.5 pr-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-colors outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                className="flex items-center space-x-3 p-1.5 pr-3 bg-[#111317] hover:bg-[#1a1d23] border border-[#2a2e36] rounded transition-colors outline-none focus:ring-2 focus:ring-[#345e8c]"
               >
-                <div className="h-7 w-7 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center">
-                  <User className="h-4 w-4 text-slate-400" />
+                <div className="h-7 w-7 rounded bg-[#1a1d23] border border-[#2a2e36] flex items-center justify-center">
+                  <User className="h-4 w-4 text-[#b6bdc9]" />
                 </div>
                 <div className="text-left hidden md:block">
                   <p className="text-xs font-bold text-white leading-none">Admin</p>
-                  <p className="text-[10px] text-slate-400 leading-none mt-0.5">Director</p>
+                  <p className="text-[10px] text-[#7e8795] leading-none mt-0.5">Director</p>
                 </div>
                 <ChevronDown className={`h-3 w-3 text-slate-500 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Dropdown Menu */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-3 w-56 bg-[#0d1326] border border-white/10 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="px-4 py-2 border-b border-white/5 mb-1">
-                    <p className="text-sm font-bold text-white">System Admin</p>
-                    <p className="text-xs text-slate-400 font-mono mt-1">Clearance: Level 5</p>
+                <div className="absolute right-0 mt-3 w-56 bg-white border border-[#e5e7eb] rounded-md shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-4 py-2 border-b border-[#e5e7eb] mb-1">
+                    <p className="text-sm font-bold text-[#111827]">System Admin</p>
+                    <p className="text-xs text-slate-500 font-mono mt-1">Clearance: Level 5</p>
                   </div>
                   
                   <button 
@@ -155,7 +155,7 @@ export function AppShell({ children, title, subtitle }: { children: React.ReactN
                       setIsProfileOpen(false);
                       navigate({ to: '/login' });
                     }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center"
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
                     Disconnect Terminal

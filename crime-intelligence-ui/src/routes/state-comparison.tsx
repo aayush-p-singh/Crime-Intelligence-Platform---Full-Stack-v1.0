@@ -12,10 +12,10 @@ import { Scale, Activity, Users, ShieldAlert, Crosshair, AlertCircle, Loader2 } 
 
 // --- Theme Constants ---
 const COLORS = {
-  state1: '#3b82f6', // blue-500
-  state2: '#8b5cf6', // violet-500
-  text: '#cbd5e1',
-  grid: '#334155'
+  state1: '#8daed1',
+  state2: '#b6bdc9',
+  text: '#b6bdc9',
+  grid: '#2a2e36'
 };
 
 // --- Reusable Component ---

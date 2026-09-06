@@ -30,10 +30,10 @@ function ClientSideForceGraph(props: any) {
 
 // --- Theme Constants ---
 const NODE_COLORS: Record<string, string> = {
-  'State': '#3b82f6',   // blue-500
-  'Metric': '#8b5cf6',  // violet-500
-  'AI': '#ec4899',      // pink-500
-  'Unknown': '#94a3b8'  // slate-400
+  'State': '#345e8c',
+  'Metric': '#8daed1',
+  'AI': '#b6bdc9',
+  'Unknown': '#7e8795'
 };
 
 // --- Main Route Component ---
@@ -171,12 +171,12 @@ function KnowledgeGraphComponent() {
                   nodeColor={(node: any) => {
                     const isSearchHit = searchQuery && filteredNodes.includes(node);
                     const baseColor = NODE_COLORS[node.group] || NODE_COLORS['Unknown'];
-                    if (highlightNodes.size > 0 && !highlightNodes.has(node.id)) return '#334155'; // Dim non-neighbors
-                    if (isSearchHit) return '#fbbf24'; // Highlight search matches
+                    if (highlightNodes.size > 0 && !highlightNodes.has(node.id)) return '#2a2e36';
+                    if (isSearchHit) return '#f59e0b';
                     return baseColor;
                   }}
                   nodeRelSize={6}
-                  linkColor={(link: any) => highlightLinks.has(link) ? '#60a5fa' : '#334155'}
+                  linkColor={(link: any) => highlightLinks.has(link) ? '#8daed1' : '#2a2e36'}
                   linkWidth={(link: any) => highlightLinks.has(link) ? 2 : 1}
                   linkDirectionalParticles={(link: any) => highlightLinks.has(link) ? 4 : 0}
                   linkDirectionalParticleWidth={3}
@@ -190,7 +190,7 @@ function KnowledgeGraphComponent() {
                     }
                   }}
                   d3VelocityDecay={0.3} // Makes the physics settle slightly faster
-                  backgroundColor="#0f172a" // slate-900 to match theme perfectly
+                  backgroundColor="#0b0b0d"
                 />
               </div>
             )}

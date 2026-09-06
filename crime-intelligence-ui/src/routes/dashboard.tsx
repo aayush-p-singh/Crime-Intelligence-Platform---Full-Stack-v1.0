@@ -15,7 +15,7 @@ import { api, type ExecutiveBriefing } from '../lib/api';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
+const COLORS = ['#dc2626', '#f59e0b', '#b6bdc9', '#2fbf71', '#345e8c'];
 
 function formatRelativeTime(milliseconds: number): string {
   const seconds = Math.max(0, Math.floor(milliseconds / 1000));

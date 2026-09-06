@@ -11,13 +11,13 @@ import { api, StateData, ThreatFilter, ThreatStateAssessment } from '../lib/api'
 type ColorMode = 'risk' | 'crimeRate';
 
 const RISK_COLORS: Record<string, string> = {
-  'Critical': '#111827',
-  'High': '#ef4444',
-  'Elevated': '#f97316',
-  'Guarded': '#eab308',
-  'Medium': '#eab308',
-  'Low': '#22c55e',
-  'Unknown': '#3b82f6',  // blue-500
+  'Critical': '#dc2626',
+  'High': '#a83b43',
+  'Elevated': '#f59e0b',
+  'Guarded': '#7e8795',
+  'Medium': '#7e8795',
+  'Low': '#2fbf71',
+  'Unknown': '#345e8c',
 };
 
 const THREAT_FILTERS: Array<{ value: ThreatFilter; label: string }> = [
@@ -37,7 +37,7 @@ const INDIA_TOPO_JSON = "https://raw.githubusercontent.com/udit-001/india-maps-d
 
 function getCrimeRateColor(rate: number, maxRate: number): string {
   const intensity = Math.min(Math.max(rate / (maxRate || 1), 0.1), 1);
-  return `rgba(139, 92, 246, ${intensity})`; 
+  return `rgba(52, 94, 140, ${intensity})`; 
 }
 
 // Helper to match map TopoJSON names with DB names
@@ -60,7 +60,7 @@ function Sparkline({ values }: { values: number[] }) {
   const min = Math.min(...values);
   const range = max - min || 1;
   const points = values.map((value, index) => `${(index / (values.length - 1)) * 100},${28 - ((value - min) / range) * 24}`).join(' ');
-  return <svg viewBox="0 0 100 32" className="h-8 w-24" role="img" aria-label="Historical crime trend"><polyline points={points} fill="none" stroke="#22d3ee" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  return <svg viewBox="0 0 100 32" className="h-8 w-24" role="img" aria-label="Historical crime trend"><polyline points={points} fill="none" stroke="#8daed1" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter" /></svg>;
 }
 
 // --- Reusable Components ---

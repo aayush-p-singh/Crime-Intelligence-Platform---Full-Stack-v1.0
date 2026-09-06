@@ -19,12 +19,12 @@ function ClientSideForceGraph(props: any) {
 }
 
 const GROUP_COLORS: Record<string, string> = {
-  Threat: '#ef4444',
-  Country: '#38bdf8',
-  Organization: '#a78bfa',
-  Technology: '#22d3ee',
-  'Crime Type': '#fb923c',
-  Recommendation: '#34d399',
+  Threat: '#dc2626',
+  Country: '#8daed1',
+  Organization: '#b6bdc9',
+  Technology: '#345e8c',
+  'Crime Type': '#f59e0b',
+  Recommendation: '#2fbf71',
 };
 
 function AnimatedNumber({ value }: { value: number }) {
