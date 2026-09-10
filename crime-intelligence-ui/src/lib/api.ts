@@ -1,5 +1,5 @@
 // API Base Configuration
-const API_BASE_URL = 'https://crime-intelligence.onrender.com';
+const API_BASE_URL = "https://crime-intelligence.onrender.com";
 
 // --- Type Definitions ---
 
@@ -16,7 +16,7 @@ export interface ChartDataPoint {
 }
 
 export interface PredictionResult {
-  risk: 'Low' | 'Medium' | 'High' | 'Critical';
+  risk: "Low" | "Medium" | "High" | "Critical";
   recommendation: string;
   confidence: number;
 }
@@ -25,6 +25,7 @@ export interface GraphNode {
   id: string;
   label: string;
   type: string;
+  group?: string;
   [key: string]: any;
 }
 
@@ -48,11 +49,19 @@ export interface StateData {
   risk?: string;
 }
 
-export type ThreatFilter = 'overallThreat' | 'cybercrime' | 'womenSafety' | 'financialFraud' | 'organizedCrime' | 'propertyCrime' | 'violentCrime' | 'emergingCrimes';
+export type ThreatFilter =
+  | "overallThreat"
+  | "cybercrime"
+  | "womenSafety"
+  | "financialFraud"
+  | "organizedCrime"
+  | "propertyCrime"
+  | "violentCrime"
+  | "emergingCrimes";
 
 export interface ThreatStateAssessment {
   name: string;
-  riskLevel: 'Low' | 'Guarded' | 'Elevated' | 'High' | 'Critical';
+  riskLevel: "Low" | "Guarded" | "Elevated" | "High" | "Critical";
   threatScore: number;
   confidence: string;
   lastUpdated: string;
@@ -66,8 +75,20 @@ export interface ThreatStateAssessment {
   threatAssessment: string;
   policeRecommendations: string[];
   citizenRecommendations: string[];
-  recentHeadlines: Array<{ title: string; url: string; publicationDate?: string | null; sourceName?: string | null; summary?: string }>;
-  supportingSources: Array<{ title: string; url: string; publicationDate?: string | null; sourceName?: string | null; summary?: string }>;
+  recentHeadlines: Array<{
+    title: string;
+    url: string;
+    publicationDate?: string | null;
+    sourceName?: string | null;
+    summary?: string;
+  }>;
+  supportingSources: Array<{
+    title: string;
+    url: string;
+    publicationDate?: string | null;
+    sourceName?: string | null;
+    summary?: string;
+  }>;
   categoryScores: Record<ThreatFilter, number>;
 }
 
@@ -83,7 +104,6 @@ export interface ForecastResponse {
 }
 
 // The backend returns an array of StateData for the comparison endpoint
-
 
 export interface ComparisonData {
   state1: StateData;
@@ -164,22 +184,20 @@ export interface ExecutiveBriefing {
  */
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const headers = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...options?.headers,
   };
 
   try {
     const response = await fetch(url, { ...options, headers });
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message || `API Error: ${response.status} ${response.statusText}`
-      );
+      throw new Error(errorData?.message || `API Error: ${response.status} ${response.statusText}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error(`[API Error] -> ${endpoint}:`, error);
@@ -191,40 +209,46 @@ async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
 export const api = {
   // Dashboard APIs
-  getDashboardKPIs: () => apiFetch<DashboardKPIs>('/api/dashboard/kpis'),
-  getCrimeRateChart: () => apiFetch<ChartDataPoint[]>('/api/dashboard/crime-rate'),
-  getWomenCrimeChart: () => apiFetch<ChartDataPoint[]>('/api/dashboard/women-crime'),
-  getChargesheetChart: () => apiFetch<ChartDataPoint[]>('/api/dashboard/chargesheet'),
-  getTotalCrimeChart: () => apiFetch<ChartDataPoint[]>('/api/dashboard/total-crime'),
-  getRiskDistribution: () => apiFetch<ChartDataPoint[]>('/api/dashboard/risk-distribution'),
-  getTrend: () => apiFetch<ChartDataPoint[]>('/api/dashboard/trend'),
+  getDashboardKPIs: () => apiFetch<DashboardKPIs>("/api/dashboard/kpis"),
+  getCrimeRateChart: () => apiFetch<ChartDataPoint[]>("/api/dashboard/crime-rate"),
+  getWomenCrimeChart: () => apiFetch<ChartDataPoint[]>("/api/dashboard/women-crime"),
+  getChargesheetChart: () => apiFetch<ChartDataPoint[]>("/api/dashboard/chargesheet"),
+  getTotalCrimeChart: () => apiFetch<ChartDataPoint[]>("/api/dashboard/total-crime"),
+  getRiskDistribution: () => apiFetch<ChartDataPoint[]>("/api/dashboard/risk-distribution"),
+  getTrend: () => apiFetch<ChartDataPoint[]>("/api/dashboard/trend"),
 
   // State & Map APIs
-  getStates: () => apiFetch<string[]>('/states'),
-  getMapData: () => apiFetch<StateData[]>('/map-data'),
-  getThreatIntelligence: () => apiFetch<ThreatStateAssessment[]>('/api/threat-intelligence'),
-  getStateThreatIntelligence: (state: string) => apiFetch<ThreatStateAssessment>(`/api/threat-intelligence/${encodeURIComponent(state)}`),
-  getStateDetails: (state: string) => apiFetch<StateData>(`/api/state/${encodeURIComponent(state)}`),
-  compareStates: (state1: string, state2: string) => 
-    apiFetch<ComparisonData>(`/compare/${encodeURIComponent(state1)}/${encodeURIComponent(state2)}`),
+  getStates: () => apiFetch<string[]>("/states"),
+  getMapData: () => apiFetch<StateData[]>("/map-data"),
+  getThreatIntelligence: () => apiFetch<ThreatStateAssessment[]>("/api/threat-intelligence"),
+  getStateThreatIntelligence: (state: string) =>
+    apiFetch<ThreatStateAssessment>(`/api/threat-intelligence/${encodeURIComponent(state)}`),
+  getStateDetails: (state: string) =>
+    apiFetch<StateData>(`/api/state/${encodeURIComponent(state)}`),
+  compareStates: (state1: string, state2: string) =>
+    apiFetch<ComparisonData>(
+      `/compare/${encodeURIComponent(state1)}/${encodeURIComponent(state2)}`,
+    ),
 
   // Prediction & Knowledge Graph
-  getPrediction: (state: string) => apiFetch<PredictionResult>(`/api/predict/${encodeURIComponent(state)}`),
-  getKnowledgeGraph: (state: string) => apiFetch<KnowledgeGraphData>(`/api/graph/${encodeURIComponent(state)}`),
+  getPrediction: (state: string) =>
+    apiFetch<PredictionResult>(`/api/predict/${encodeURIComponent(state)}`),
+  getKnowledgeGraph: (state: string) =>
+    apiFetch<KnowledgeGraphData>(`/api/graph/${encodeURIComponent(state)}`),
 
   // AI Officer API
-  chatWithOfficer: (data: OfficerMessageRequest) => 
-    apiFetch<OfficerReply>('/api/officer', {
-      method: 'POST',
+  chatWithOfficer: (data: OfficerMessageRequest) =>
+    apiFetch<OfficerReply>("/api/officer", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
-  getExecutiveBriefing: () => apiFetch<ExecutiveBriefing>('/api/executive-briefing'),
+  getExecutiveBriefing: () => apiFetch<ExecutiveBriefing>("/api/executive-briefing"),
 
-// AI Forecasting
-  getThreatForecast: (data: ForecastRequest) => 
-    apiFetch<ForecastResponse>('/api/forecast', {
-      method: 'POST',
+  // AI Forecasting
+  getThreatForecast: (data: ForecastRequest) =>
+    apiFetch<ForecastResponse>("/api/forecast", {
+      method: "POST",
       body: JSON.stringify(data),
-    }),    
+    }),
 };

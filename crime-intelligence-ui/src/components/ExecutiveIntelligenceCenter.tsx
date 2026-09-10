@@ -1,104 +1,197 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ExternalLink, Loader2, Network } from 'lucide-react';
-import type { ExecutiveBriefing } from '../lib/api';
-import {
-  getOperationalAssessment,
-  getRelationshipGraph,
-  getSourceIntelligence,
-  getThreatDistribution,
-  getTopKeywords,
-} from '../lib/executiveBriefingAnalysis';
+import * as React from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
+import type { ExecutiveBriefing } from "../lib/api";
+import { extractKeywords, buildBriefingGraph } from "../lib/executiveBriefingAnalysis";
 
-function ClientSideForceGraph(props: any) {
-  const [ForceGraph2D, setForceGraph2D] = useState<any>(null);
-  useEffect(() => {
-    import('react-force-graph-2d').then((module) => setForceGraph2D(() => module.default));
-  }, []);
-  if (!ForceGraph2D) return <div className="flex h-full items-center justify-center text-xs text-slate-500"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Initializing intelligence graph...</div>;
-  return <ForceGraph2D {...props} />;
-}
-
-const GROUP_COLORS: Record<string, string> = {
-  Threat: '#dc2626',
-  Country: '#8daed1',
-  Organization: '#b6bdc9',
-  Technology: '#345e8c',
-  'Crime Type': '#f59e0b',
-  Recommendation: '#2fbf71',
-};
-
-function AnimatedNumber({ value }: { value: number }) {
+// Animated number counter
+function AnimatedNumber({ value, duration = 600 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
   useEffect(() => {
+    if (!Number.isFinite(value)) return;
     let frame = 0;
     const started = performance.now();
     const tick = (now: number) => {
-      const progress = Math.min((now - started) / 700, 1);
-      setDisplay(Math.round(value * (1 - Math.pow(1 - progress, 3))));
+      const progress = Math.min((now - started) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(value * eased));
       if (progress < 1) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [value]);
-  return <>{display}</>;
+  }, [value, duration]);
+  return <>{display.toLocaleString()}</>;
 }
 
-function ViewportBar({ percentage }: { percentage: number }) {
+function ViewportBar({ score }: { score: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.35 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
-  return <div ref={ref} className="h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-cyan-400 transition-[width] duration-700 ease-out" style={{ width: visible ? `${percentage}%` : '0%' }} /></div>;
-}
 
-export function ExecutiveIntelligenceCenter({ briefing }: { briefing: ExecutiveBriefing }) {
-  const distribution = useMemo(() => getThreatDistribution(briefing), [briefing]);
-  const keywords = useMemo(() => getTopKeywords(briefing), [briefing]);
-  const sources = useMemo(() => getSourceIntelligence(briefing), [briefing]);
-  const graph = useMemo(() => getRelationshipGraph(briefing), [briefing]);
-  const assessment = useMemo(() => getOperationalAssessment(briefing), [briefing]);
-  const [selectedNode, setSelectedNode] = useState<any>(null);
+  const barColor = score >= 70 ? "bg-[#7F1D1D]" : score >= 40 ? "bg-[#555555]" : "bg-[#111111]";
 
   return (
-    <div className="mt-5 space-y-5 border-t border-white/10 pt-5 page-enter">
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <div><h3 className="text-sm font-bold uppercase tracking-wider text-cyan-300">National Threat Intelligence Center</h3><p className="text-xs text-slate-500">Derived from the current briefing evidence set</p></div>
-          <span className="rounded-full border border-cyan-500/20 bg-cyan-500/5 px-2 py-1 text-[10px] text-cyan-300">Operational view</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {[
-            ['Articles analyzed', briefing.sources.length],
-            ['Unique sources', new Set(briefing.sources.map((source) => source.sourceName || source.url)).size],
-            ['Earliest publication', briefing.sources.map((source) => source.publicationDate).filter(Boolean).sort()[0] || 'Unavailable'],
-            ['Latest publication', briefing.sources.map((source) => source.publicationDate).filter(Boolean).sort().at(-1) || 'Unavailable'],
-            ['Average article age', sources.averagePublicationRecency],
-            ['Confidence', `${briefing.confidenceEvidence?.score ?? 0}/100`],
-            ['Evidence quality', briefing.confidenceEvidence?.evidenceQuality || 'Unavailable'],
-            ['Risk level', briefing.riskLevel],
-          ].map(([label, value]) => <div key={String(label)} className="intelligence-card intelligence-card-hover rounded-lg border border-white/10 bg-slate-950/40 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">{label}</p><p className="mt-1 truncate text-sm font-bold text-slate-200">{typeof value === 'number' ? <AnimatedNumber value={value} /> : value}</p></div>)}
-        </div>
-        <p className="mt-3 text-xs leading-5 text-slate-400">{assessment}</p>
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-2">
-        <div><h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Threat Distribution</h3><div className="space-y-2">{distribution.map((item) => <div key={item.category} className="intelligence-card intelligence-card-hover rounded-lg p-2"><div className="mb-1 flex justify-between text-xs text-slate-400"><span>{item.category}</span><span>{item.count} articles</span></div><ViewportBar percentage={item.percentage} /></div>)}</div></div>
-        <div><h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Top Intelligence Keywords</h3><div className="flex flex-wrap gap-2">{keywords.map((keyword) => <span key={keyword} className="rounded-full border border-blue-500/20 bg-blue-500/10 px-2 py-1 text-[11px] text-blue-200">{keyword}</span>)}</div></div>
-      </div>
-
-      <div><h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Source Intelligence</h3><div className="grid grid-cols-2 gap-2 md:grid-cols-5">{[['Most frequent publisher', sources.mostFrequentPublisher], ['Government sources', sources.governmentSources], ['International sources', sources.internationalSources], ['Avg recency', sources.averagePublicationRecency], ['Source diversity', `${sources.sourceDiversityScore}/100`]].map(([label, value]) => <div key={String(label)} className="intelligence-card intelligence-card-hover rounded-lg border border-white/10 bg-slate-950/40 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">{label}</p><p className="mt-1 truncate text-sm font-bold text-slate-200">{typeof value === 'number' ? <AnimatedNumber value={value} /> : value}</p></div>)}</div></div>
-
-      <div><div className="mb-3 flex items-center gap-2"><Network className="h-4 w-4 text-cyan-300" /><h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Intelligence Relationship Graph</h3></div><div className="grid min-h-[320px] grid-cols-1 overflow-hidden rounded-lg border border-white/10 bg-slate-950/60 lg:grid-cols-[1fr_240px]"><ClientSideForceGraph graphData={graph} warmupTicks={80} cooldownTicks={60} d3AlphaDecay={0.03} nodeLabel={(node: any) => `${node.name} · ${node.evidenceCount} evidence`} nodeColor={(node: any) => GROUP_COLORS[node.group] || '#94a3b8'} linkColor={() => 'rgba(148,163,184,0.3)'} linkWidth={(link: any) => Math.min(link.evidenceCount + 1, 4)} onNodeClick={(node: any) => setSelectedNode(node)} nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => { const label = node.name; const fontSize = Math.max(8 / globalScale, 3); ctx.beginPath(); ctx.shadowBlur = 10; ctx.shadowColor = GROUP_COLORS[node.group] || '#94a3b8'; ctx.fillStyle = GROUP_COLORS[node.group] || '#94a3b8'; ctx.arc(node.x, node.y, Math.max(3, 5 / globalScale), 0, 2 * Math.PI); ctx.fill(); ctx.shadowBlur = 0; ctx.font = `${fontSize}px Sans-Serif`; ctx.fillStyle = '#cbd5e1'; ctx.fillText(label, node.x + 7 / globalScale, node.y + 3 / globalScale); }} />{selectedNode ? <div className="border-l border-white/10 p-4 page-enter"><p className="text-[10px] uppercase tracking-wider text-cyan-300">Selected entity</p><h4 className="mt-1 text-sm font-bold text-white">{selectedNode.name}</h4><p className="mt-2 text-xs text-slate-400">{selectedNode.group} · {selectedNode.evidenceCount} evidence items</p><div className="mt-3 space-y-2">{selectedNode.articles.map((article: ExecutiveBriefing['sources'][number]) => <a key={article.url} href={article.url} target="_blank" rel="noreferrer" className="flex gap-2 text-xs text-slate-400 transition-colors hover:text-white"><ExternalLink className="mt-0.5 h-3 w-3 flex-shrink-0" />{article.title}</a>)}</div></div> : <div className="border-l border-white/10 p-4 text-xs text-slate-500">Select a node to inspect connected evidence, sources, and publication dates.</div>}</div></div>
+    <div ref={ref} className="mt-2 h-1 overflow-hidden rounded-full bg-[#E8E8E8]">
+      <div
+        className={`h-full rounded-full transition-[width] duration-500 ease-out ${barColor}`}
+        style={{ width: visible ? `${score}%` : "0%" }}
+      />
     </div>
+  );
+}
+
+// Lazy-loaded force graph
+const ClientSideForceGraph = React.lazy(() =>
+  import("react-force-graph-2d").then((mod) => ({ default: mod.default })),
+);
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05 } },
+};
+const fadeUp = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+};
+
+export function ExecutiveIntelligenceCenter({ briefing }: { briefing: ExecutiveBriefing }) {
+  const graphData = useMemo(() => buildBriefingGraph(briefing), [briefing]);
+  const keywords = useMemo(() => extractKeywords(briefing.executiveSummary), [briefing]);
+
+  return (
+    <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6 pt-2">
+      {/* Top Stats Row */}
+      <motion.div variants={fadeUp} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="premium-card rounded-2xl p-5 shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#888] mb-1">
+            Threat Status
+          </p>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-white/80 backdrop-blur-md border border-[#E8E8E8] text-[#111]">
+            {briefing.riskLevel}
+          </span>
+        </div>
+        <div className="premium-card rounded-2xl p-5 shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#888] mb-1">
+            Confidence
+          </p>
+          <p className="text-xl font-semibold text-[#111] font-display">{briefing.confidence}</p>
+        </div>
+        <div className="premium-card rounded-2xl p-5 shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#888] mb-1">
+            Sources Audited
+          </p>
+          <p className="text-xl font-semibold text-[#111] font-display">
+            <AnimatedNumber value={briefing.sources?.length ?? 0} />
+          </p>
+        </div>
+        <div className="premium-card rounded-2xl p-5 shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#888] mb-1">
+            Last Synchronized
+          </p>
+          <p className="text-xs font-medium text-[#111] pt-1">
+            {new Date(briefing.retrievalTimestamp).toLocaleTimeString()}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Severity Matrix */}
+      {briefing.severityMatrix && briefing.severityMatrix.length > 0 && (
+        <motion.div variants={fadeUp} className="premium-card rounded-2xl p-6 shadow-sm">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#111] mb-4">
+            Severity Breakdown
+          </h3>
+          <div className="space-y-4">
+            {briefing.severityMatrix.map((item) => (
+              <div key={item.category}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium text-[#666]">{item.category}</span>
+                  <span className="text-xs font-mono text-[#111]">{item.score}/100</span>
+                </div>
+                <ViewportBar score={item.score} />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Intelligence Graph: Monochrome network */}
+      {graphData.nodes.length > 0 && (
+        <motion.div variants={fadeUp} className="premium-card rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#111]">
+              Entity Relationship Network
+            </h3>
+            <span className="text-[10px] font-mono text-[#888]">MONOCHROME TOPOLOGY</span>
+          </div>
+          <div className="h-[280px] rounded-2xl overflow-hidden bg-white/80 backdrop-blur-md border border-[#E8E8E8]">
+            <React.Suspense
+              fallback={
+                <div className="h-full flex items-center justify-center text-xs text-[#888]">
+                  Rendering topology...
+                </div>
+              }
+            >
+              <ClientSideForceGraph
+                graphData={graphData}
+                width={600}
+                height={280}
+                backgroundColor="#FAFAFA"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                nodeColor={(node: any) => {
+                  switch (node.group) {
+                    case "Threat":
+                      return "#7F1D1D";
+                    case "Technology":
+                      return "#111111";
+                    case "Organization":
+                      return "#444444";
+                    default:
+                      return "#777777";
+                  }
+                }}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                nodeLabel={(node: any) => node.name || node.id || ""}
+                linkColor={() => "#E8E8E8"}
+                linkWidth={1}
+                nodeRelSize={4}
+              />
+            </React.Suspense>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Keywords */}
+      {keywords.length > 0 && (
+        <motion.div variants={fadeUp} className="premium-card rounded-2xl p-6 shadow-sm">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#111] mb-3">
+            Audited Focus Terms
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {keywords.slice(0, 16).map((kw) => (
+              <span
+                key={kw}
+                className="px-2.5 py-1 rounded-2xl bg-white/80 backdrop-blur-md border border-[#E8E8E8] text-xs font-medium text-[#111]"
+              >
+                {kw}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }

@@ -47,7 +47,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           A transient failure occurred on this workstation.
         </p>
         <button
-          onClick={() => { router.invalidate(); reset(); }}
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
           className="mt-6 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Retry
@@ -63,9 +66,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "CrimeIntel — AI Crime Intelligence Platform" },
-      { name: "description", content: "Enterprise AI-powered crime intelligence platform for government agencies. Real-time analytics, geospatial insights, and knowledge graphs." },
+      {
+        name: "description",
+        content:
+          "Enterprise AI-powered crime intelligence platform for government agencies. Real-time analytics, geospatial insights, and knowledge graphs.",
+      },
       { property: "og:title", content: "CrimeIntel — AI Crime Intelligence Platform" },
-      { property: "og:description", content: "Enterprise AI crime intelligence for government agencies." },
+      {
+        property: "og:description",
+        content: "Enterprise AI crime intelligence for government agencies.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -73,7 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -86,8 +99,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }
@@ -96,7 +114,9 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="app-route-enter"><Outlet /></div>
+      <div className="app-route-enter">
+        <Outlet />
+      </div>
       <BootScreen />
     </QueryClientProvider>
   );
