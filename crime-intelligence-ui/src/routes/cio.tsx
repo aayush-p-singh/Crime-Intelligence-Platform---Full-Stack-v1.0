@@ -85,7 +85,11 @@ function TypingIndicator() {
 }
 
 // Simple text formatter to handle basic markdown-like structures
-const renderFormattedContent = (content: string) => {
+const renderFormattedContent = (content: any) => {
+  if (typeof content !== 'string' || !content.trim()) {
+    return <span className="text-[#888] italic">No intelligence response generated.</span>;
+  }
+
   const lines = content.split('\n');
   const elements: React.ReactNode[] = [];
   let currentList: React.ReactNode[] = [];
@@ -307,7 +311,7 @@ function CIOComponent() {
         {
           id: Date.now().toString(),
           role: "ai",
-          content: data.reply,
+          content: data.reply || (data as any).answer || (data as any).content || null,
           retrieval: data.retrieval,
         },
       ]);

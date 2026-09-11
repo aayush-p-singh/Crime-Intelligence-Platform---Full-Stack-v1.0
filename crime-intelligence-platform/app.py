@@ -47,7 +47,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 try:
     db = Neo4jConnection()
 except Exception as e:
-    print(f"⚠️ Database connection skipped: {e}")
+    print(f"Database connection skipped: {e}")
     db = None
 
 # ==========================================================
@@ -55,9 +55,9 @@ except Exception as e:
 # ==========================================================
 try:
     model = joblib.load("crime_model.pkl")
-    print("✅ AI Predictive Model loaded successfully!")
+    print("AI Predictive Model loaded successfully!")
 except Exception as e:
-    print(f"⚠️ Warning: Could not load crime_model.pkl. Error: {e}")
+    print(f"Warning: Could not load crime_model.pkl. Error: {e}")
     model = None
 
 # ==========================================================

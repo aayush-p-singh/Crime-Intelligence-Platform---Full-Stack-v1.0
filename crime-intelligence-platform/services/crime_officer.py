@@ -210,10 +210,11 @@ Write like a professional intelligence officer briefing a senior official.
 
         response = client.chat.completions(
             model="sarvam-105b",
-            messages=messages
-    )
-
-        reply = response.choices[0].message.content
+            messages=messages,
+            max_tokens=4096
+        )
+        
+        reply = response.choices[0].message.content or ""
 
         self.history.append({
         "role": "user",
@@ -365,8 +366,8 @@ Write like a professional intelligence officer briefing a senior official.
                 "role":"user",
                 "content":prompt
             }
-        ]
-
+        ],
+        max_tokens=4096
     )
 
         return response.choices[0].message.content
