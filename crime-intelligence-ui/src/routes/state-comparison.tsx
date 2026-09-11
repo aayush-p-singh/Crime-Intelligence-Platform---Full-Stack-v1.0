@@ -47,21 +47,21 @@ function ComparisonCard({
   const is2Higher = value2 > value1;
 
   return (
-    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-between">
-      <h4 className="text-sm font-semibold text-slate-400 mb-4">{label}</h4>
+    <div className="bg-black/[0.02] backdrop-blur-md border border-black/[0.06] rounded-xl p-4 flex flex-col justify-between">
+      <h4 className="text-sm font-semibold text-[#666] mb-4">{label}</h4>
       <div className="flex justify-between items-end">
         <div className="flex flex-col">
-          <span className={`text-2xl font-bold ${is1Higher ? "text-blue-400" : "text-slate-300"}`}>
+          <span className={`text-2xl font-bold ${is1Higher ? "text-[#0891b2]" : "text-[#444]"}`}>
             {prefix}
             {value1.toLocaleString()}
             {suffix}
           </span>
-          <span className="text-xs text-slate-500">State 1</span>
+          <span className="text-xs text-[#888]">State 1</span>
         </div>
 
         {diff !== 0 && (
           <div className="flex flex-col items-center justify-center px-4">
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-[#666]">
               Δ {Math.abs(diff).toLocaleString()}
               {suffix}
             </span>
@@ -71,13 +71,13 @@ function ComparisonCard({
 
         <div className="flex flex-col text-right">
           <span
-            className={`text-2xl font-bold ${is2Higher ? "text-purple-400" : "text-slate-300"}`}
+            className={`text-2xl font-bold ${is2Higher ? "text-purple-400" : "text-[#444]"}`}
           >
             {prefix}
             {value2.toLocaleString()}
             {suffix}
           </span>
-          <span className="text-xs text-slate-500">State 2</span>
+          <span className="text-xs text-[#888]">State 2</span>
         </div>
       </div>
     </div>
@@ -147,13 +147,13 @@ function StateComparisonComponent() {
     <AppShell title="State Comparison" subtitle="Cross-reference regional intelligence metrics.">
       <div className="p-6 md:p-8 space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
         {/* Selection Bar */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-center">
+        <div className="bg-white/80 backdrop-blur-sm border border-black/[0.06] rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-1 w-full">
-            <label className="block text-sm font-medium text-blue-400 mb-2">
+            <label className="block text-sm font-medium text-[#0891b2] mb-2">
               Primary Target (State 1)
             </label>
             <select
-              className="w-full bg-slate-800 border border-white/10 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full bg-[#f5f5f5] border border-black/[0.06] rounded-lg p-3 text-[#111] focus:ring-2 focus:ring-blue-500 outline-none"
               value={state1}
               onChange={(e) => setState1(e.target.value)}
               disabled={isListLoading}
@@ -168,8 +168,8 @@ function StateComparisonComponent() {
           </div>
 
           <div className="flex items-center justify-center pt-6">
-            <div className="p-3 bg-white/5 rounded-full border border-white/10">
-              <Scale className="h-6 w-6 text-slate-400" />
+            <div className="p-3 bg-black/[0.02] rounded-full border border-black/[0.06]">
+              <Scale className="h-6 w-6 text-[#666]" />
             </div>
           </div>
 
@@ -178,7 +178,7 @@ function StateComparisonComponent() {
               Secondary Target (State 2)
             </label>
             <select
-              className="w-full bg-slate-800 border border-white/10 rounded-lg p-3 text-white focus:ring-2 focus:ring-purple-500 outline-none"
+              className="w-full bg-[#f5f5f5] border border-black/[0.06] rounded-lg p-3 text-[#111] focus:ring-2 focus:ring-purple-500 outline-none"
               value={state2}
               onChange={(e) => setState2(e.target.value)}
               disabled={isListLoading}
@@ -195,20 +195,20 @@ function StateComparisonComponent() {
 
         {/* Dynamic Content Area */}
         {!canCompare ? (
-          <div className="flex flex-col items-center justify-center py-24 opacity-50 bg-white/5 rounded-xl border border-white/5 border-dashed">
-            <Crosshair className="h-16 w-16 text-slate-400 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Awaiting Parameters</h3>
-            <p className="text-sm text-slate-400">
+          <div className="flex flex-col items-center justify-center py-24 opacity-50 bg-black/[0.02] rounded-xl border border-black/[0.04] border-dashed">
+            <Crosshair className="h-16 w-16 text-[#666] mb-4" />
+            <h3 className="text-xl font-bold text-[#111] mb-2">Awaiting Parameters</h3>
+            <p className="text-sm text-[#666]">
               Select two distinct states above to initiate comparison protocols.
             </p>
           </div>
         ) : isCompLoading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Loader2 className="h-10 w-10 text-blue-500 animate-spin mb-4" />
-            <p className="text-slate-300">Correlating intelligence records...</p>
+            <p className="text-[#444]">Correlating intelligence records...</p>
           </div>
         ) : compError ? (
-          <div className="flex flex-col items-center justify-center py-24 text-red-400">
+          <div className="flex flex-col items-center justify-center py-24 text-red-600">
             <AlertCircle className="h-10 w-10 mb-4" />
             <p>Error retrieving comparison data.</p>
           </div>
@@ -243,12 +243,12 @@ function StateComparisonComponent() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-6 flex justify-between items-center">
                 <div>
-                  <h4 className="text-blue-400 font-bold mb-1">
+                  <h4 className="text-[#0891b2] font-bold mb-1">
                     {compData[0].name} AI Threat Level
                   </h4>
-                  <p className="text-sm text-slate-400">Predicted by Random Forest Engine</p>
+                  <p className="text-sm text-[#666]">Predicted by Random Forest Engine</p>
                 </div>
-                <span className="px-4 py-2 rounded font-bold uppercase tracking-wider border border-white/20 bg-white/5 text-white">
+                <span className="px-4 py-2 rounded font-bold uppercase tracking-wider border border-black/[0.08] bg-black/[0.02] text-[#111]">
                   {compData[0].risk || "Unknown"}
                 </span>
               </div>
@@ -257,9 +257,9 @@ function StateComparisonComponent() {
                   <h4 className="text-purple-400 font-bold mb-1">
                     {compData[1].name} AI Threat Level
                   </h4>
-                  <p className="text-sm text-slate-400">Predicted by Random Forest Engine</p>
+                  <p className="text-sm text-[#666]">Predicted by Random Forest Engine</p>
                 </div>
-                <span className="px-4 py-2 rounded font-bold uppercase tracking-wider border border-white/20 bg-white/5 text-white">
+                <span className="px-4 py-2 rounded font-bold uppercase tracking-wider border border-black/[0.08] bg-black/[0.02] text-[#111]">
                   {compData[1].risk || "Unknown"}
                 </span>
               </div>
@@ -268,8 +268,8 @@ function StateComparisonComponent() {
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Comparative Bar Chart */}
-              <div className="bg-slate-900/50 backdrop-blur border border-white/10 rounded-xl p-6 h-[400px] flex flex-col">
-                <h3 className="text-lg font-semibold text-white mb-6">Metric Analysis</h3>
+              <div className="bg-white/80 backdrop-blur border border-black/[0.06] rounded-xl p-6 h-[400px] flex flex-col">
+                <h3 className="text-lg font-semibold text-[#111] mb-6">Metric Analysis</h3>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={barChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={COLORS.grid} vertical={false} />
@@ -287,8 +287,8 @@ function StateComparisonComponent() {
               </div>
 
               {/* Multi-vector Radar Chart */}
-              <div className="bg-slate-900/50 backdrop-blur border border-white/10 rounded-xl p-6 h-[400px] flex flex-col">
-                <h3 className="text-lg font-semibold text-white mb-2">Threat Vector Topology</h3>
+              <div className="bg-white/80 backdrop-blur border border-black/[0.06] rounded-xl p-6 h-[400px] flex flex-col">
+                <h3 className="text-lg font-semibold text-[#111] mb-2">Threat Vector Topology</h3>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                     <PolarGrid stroke={COLORS.grid} />

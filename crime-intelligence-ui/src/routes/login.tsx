@@ -47,7 +47,7 @@ function LoginComponent() {
           <div className="p-4 bg-[#111317] border border-[#2a2e36] rounded shadow-lg mb-4">
             <Shield className="h-10 w-10 text-[#8daed1]" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-widest uppercase">Crime Intel</h1>
+          <h1 className="text-2xl font-black text-[#fff] tracking-widest uppercase">Crime Intel</h1>
           <p className="text-xs font-semibold tracking-widest text-[#7e8795] uppercase mt-1">
             National Security Network Access
           </p>
@@ -57,8 +57,8 @@ function LoginComponent() {
         <div className="bg-[#15171b] border border-[#2a2e36] rounded p-8 shadow-lg relative">
           {/* Security Clearance Tag */}
           <div className="absolute -top-3 right-6 bg-[#050505] border border-[#345e8c] px-3 py-0.5 rounded flex items-center shadow">
-            <Terminal className="h-3 w-3 text-white mr-1.5" />
-            <span className="text-[10px] font-mono font-bold text-white uppercase tracking-wider">
+            <Terminal className="h-3 w-3 text-[#fff] mr-1.5" />
+            <span className="text-[10px] font-mono font-bold text-[#fff] uppercase tracking-wider">
               SSL_SECURE
             </span>
           </div>
@@ -86,7 +86,7 @@ function LoginComponent() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
-                  className="w-full bg-[#111317] border border-[#2a2e36] rounded py-3 pl-10 pr-4 text-sm text-white focus:ring-2 focus:ring-[#345e8c] outline-none placeholder:text-[#7e8795] disabled:opacity-50 transition-all font-mono"
+                  className="w-full bg-[#111317] border border-[#2a2e36] rounded py-3 pl-10 pr-4 text-sm text-[#fff] focus:ring-2 focus:ring-[#345e8c] outline-none placeholder:text-[#7e8795] disabled:opacity-50 transition-all font-mono"
                 />
               </div>
             </div>
@@ -105,7 +105,7 @@ function LoginComponent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="w-full bg-[#111317] border border-[#2a2e36] rounded py-3 pl-10 pr-4 text-sm text-white focus:ring-2 focus:ring-[#345e8c] outline-none placeholder:text-[#7e8795] disabled:opacity-50 transition-all font-mono"
+                  className="w-full bg-[#111317] border border-[#2a2e36] rounded py-3 pl-10 pr-4 text-sm text-[#fff] focus:ring-2 focus:ring-[#345e8c] outline-none placeholder:text-[#7e8795] disabled:opacity-50 transition-all font-mono"
                 />
               </div>
             </div>
@@ -114,7 +114,7 @@ function LoginComponent() {
             <button
               type="submit"
               disabled={isLoading || !username || !password}
-              className="w-full py-3.5 rounded bg-[#183a66] hover:bg-[#1a1d23] active:scale-[0.99] disabled:bg-[#2a2e36] text-white font-bold text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+              className="w-full py-3.5 rounded bg-[#183a66] hover:bg-[#1a1d23] active:scale-[0.99] disabled:bg-[#2a2e36] text-[#fff] font-bold text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>

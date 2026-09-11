@@ -14,6 +14,10 @@ import {
   ExternalLink,
   Calendar,
   Clock,
+  ShieldCheck,
+  FileText,
+  Search as SearchIcon,
+  Database
 } from "lucide-react";
 
 // --- Types ---
@@ -54,103 +58,218 @@ const SUGGESTED_PROMPTS = [
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center space-x-2 bg-slate-800/50 border border-white/5 rounded-2xl rounded-tl-sm p-4 w-fit shadow-sm max-w-[80%]">
-      <Bot className="h-5 w-5 text-purple-400 mr-2" />
-      <div className="flex space-x-1.5">
-        <div
-          className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
-          style={{ animationDelay: "0ms" }}
-        ></div>
-        <div
-          className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
-          style={{ animationDelay: "150ms" }}
-        ></div>
-        <div
-          className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
-          style={{ animationDelay: "300ms" }}
-        ></div>
+    <div className="flex w-full justify-start animate-in fade-in duration-300 mb-8">
+      <div className="flex space-x-4 max-w-[85%] md:max-w-[80%]">
+        <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center mt-1">
+          <Bot className="h-5 w-5 text-[#7c3aed]" />
+        </div>
+        <div className="bg-white border border-black/[0.06] p-5 rounded-xl shadow-sm text-[#444] text-sm w-full md:w-[400px]">
+          <div className="flex items-center gap-2 mb-3 border-b border-black/[0.04] pb-3">
+            <Loader2 className="h-4 w-4 animate-spin text-[#7c3aed]" />
+            <span className="font-bold tracking-widest uppercase text-xs text-[#7c3aed]">Analyzing Intelligence</span>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-[#666]">
+              <SearchIcon className="h-3 w-3" />
+              <span>Retrieving classified records...</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-[#666]">
+              <ShieldCheck className="h-3 w-3" />
+              <span>Correlating intelligence...</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
+// Simple text formatter to handle basic markdown-like structures
+const renderFormattedContent = (content: string) => {
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentList: React.ReactNode[] = [];
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`ul-${elements.length}`} className="list-disc marker:text-[#888] pl-5 space-y-1 mb-4">
+          {currentList}
+        </ul>
+      );
+      currentList = [];
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    
+    // Empty line
+    if (!trimmed) {
+      flushList();
+      // elements.push(<div key={index} className="h-2"></div>);
+      return;
+    }
+
+    // Bullet points
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
+      currentList.push(
+        <li key={index} className="text-[#333] leading-relaxed">
+          {trimmed.substring(2)}
+        </li>
+      );
+      return;
+    }
+    
+    // Flush list if we hit a non-list item
+    flushList();
+
+    // Bold Headers (### Header or **Header**)
+    if (trimmed.startsWith('### ')) {
+      elements.push(<h4 key={index} className="text-sm font-bold text-[#111] mt-6 mb-3">{trimmed.replace('### ', '')}</h4>);
+      return;
+    }
+    if (trimmed.startsWith('## ')) {
+      elements.push(<h3 key={index} className="text-base font-bold text-[#111] mt-8 mb-4 border-b border-black/[0.06] pb-2">{trimmed.replace('## ', '')}</h3>);
+      return;
+    }
+    
+    // All caps structural headers (e.g. KEY FINDINGS)
+    if (trimmed.length > 3 && trimmed === trimmed.toUpperCase() && !trimmed.includes('HTTP')) {
+      elements.push(<h4 key={index} className="text-xs font-bold text-[#666] tracking-widest mt-8 mb-3 uppercase">{trimmed}</h4>);
+      return;
+    }
+
+    // Paragraph
+    // handle bold text basic replacement
+    const parts = trimmed.split(/(\*\*.*?\*\*)/g);
+    elements.push(
+      <p key={index} className="mb-4 text-[#333] leading-relaxed">
+        {parts.map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="font-semibold text-[#111]">{part.slice(2, -2)}</strong>;
+          }
+          return part;
+        })}
+      </p>
+    );
+  });
+
+  flushList();
+  return <>{elements}</>;
+};
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
-  return (
-    <div
-      className={`flex w-full ${isUser ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
-    >
-      <div className={`flex flex-col space-y-2 max-w-[85%] md:max-w-[75%]`}>
-        <div
-          className={`flex items-end space-x-2 ${isUser ? "flex-row-reverse space-x-reverse" : "flex-row"}`}
-        >
-          {/* Avatar */}
-          <div
-            className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isUser ? "bg-blue-600" : "bg-purple-900/50 border border-purple-500/30"}`}
-          >
-            {isUser ? (
-              <User className="h-5 w-5 text-white" />
-            ) : (
-              <Bot className="h-5 w-5 text-purple-400" />
-            )}
+  if (isUser) {
+    return (
+      <div className="flex w-full justify-end animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
+        <div className="flex items-center space-x-3 max-w-[85%] md:max-w-[60%] flex-row-reverse space-x-reverse">
+          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#111] flex items-center justify-center shadow-md">
+            <User className="h-5 w-5 text-white" />
           </div>
-
-          {/* Bubble */}
-          <div
-            className={`
-            p-4 text-sm leading-relaxed shadow-md
-            ${
-              isUser
-                ? "bg-blue-600 text-white rounded-2xl rounded-tr-sm"
-                : message.isError
-                  ? "bg-red-900/20 border border-red-500/30 text-red-200 rounded-2xl rounded-tl-sm"
-                  : "bg-slate-800/80 backdrop-blur-sm border border-white/10 text-slate-200 rounded-2xl rounded-tl-sm"
-            }
-          `}
-          >
-            {message.isError && <AlertCircle className="h-4 w-4 inline mb-1 mr-2 text-red-400" />}
-            <span className="whitespace-pre-wrap break-words font-sans">{message.content}</span>
+          <div className="bg-white border border-black/[0.06] p-4 text-[#111] text-[15px] font-medium shadow-sm rounded-2xl rounded-tr-sm">
+            {message.content}
           </div>
         </div>
-        {message.retrieval?.required && (
-          <div className="ml-10 border-l border-white/10 pl-3 text-xs text-slate-400 space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-slate-500">Live sources</span>
-              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-emerald-300">
-                {message.retrieval.confidence} confidence
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />{" "}
-                {new Date(message.retrieval.retrievedAt).toLocaleString()}
-              </span>
-            </div>
-            {message.retrieval.notice && (
-              <p className="text-amber-300">{message.retrieval.notice}</p>
-            )}
-            {message.retrieval.sources.map((source) => (
-              <a
-                key={`${source.url}-${source.title}`}
-                href={source.url}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-start gap-2 text-slate-300 hover:text-white"
-              >
-                <ExternalLink className="mt-0.5 h-3 w-3 flex-shrink-0" />
-                <span>
-                  <span className="block">{source.title}</span>
-                  <span className="flex items-center gap-1 text-[11px] text-slate-500">
-                    <Calendar className="h-3 w-3" />{" "}
-                    {source.publicationDate
-                      ? new Date(source.publicationDate).toLocaleDateString()
-                      : "Date unavailable"}
-                    {source.sourceName ? ` · ${source.sourceName}` : ""}
-                  </span>
+      </div>
+    );
+  }
+
+  // AI Briefing Style
+  return (
+    <div className="flex w-full justify-start animate-in fade-in slide-in-from-bottom-2 duration-300 mb-12">
+      <div className="flex space-x-4 w-full md:max-w-[85%]">
+        <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-[#7c3aed]/10 border border-[#7c3aed]/20 flex items-center justify-center mt-1">
+          <Bot className="h-5 w-5 text-[#7c3aed]" />
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="bg-white border border-black/[0.06] shadow-sm rounded-xl overflow-hidden">
+            
+            {/* Briefing Header */}
+            <div className="bg-[#f8f9fa] border-b border-black/[0.04] px-6 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-[#7c3aed]" />
+                <span className="text-[11px] font-bold tracking-widest text-[#555] uppercase">Intelligence Assessment</span>
+              </div>
+              {message.retrieval?.confidence && (
+                <span className="text-[10px] font-mono tracking-wider bg-[#16a34a]/10 text-[#16a34a] border border-[#16a34a]/20 px-2 py-0.5 rounded-full uppercase">
+                  Confidence: {message.retrieval.confidence}
                 </span>
-              </a>
-            ))}
+              )}
+            </div>
+            
+            {/* Briefing Content */}
+            <div className="p-6">
+              {message.isError && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm font-medium">{message.content}</span>
+                </div>
+              )}
+              
+              {!message.isError && (
+                <div className="text-[15px]">
+                  {renderFormattedContent(message.content)}
+                </div>
+              )}
+            </div>
+
+            {/* Sources Section */}
+            {!message.isError && message.retrieval?.succeeded && message.retrieval.sources && message.retrieval.sources.length > 0 && (
+              <div className="bg-[#f8f9fa] border-t border-black/[0.04] p-6">
+                <h4 className="text-[11px] font-bold text-[#666] tracking-widest uppercase mb-4 flex items-center gap-2">
+                  <Database className="h-3 w-3" />
+                  Sources Consulted
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {message.retrieval.sources.map((source, idx) => (
+                    <a
+                      key={`${source.url}-${idx}`}
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group bg-white border border-black/[0.06] hover:border-black/[0.15] hover:shadow-sm transition-all rounded-lg p-3 flex flex-col gap-1.5"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-sm font-medium text-[#111] leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
+                          {source.title}
+                        </span>
+                        <ExternalLink className="h-3.5 w-3.5 text-[#888] flex-shrink-0 mt-0.5" />
+                      </div>
+                      
+                      <div className="flex items-center gap-3 text-[11px] text-[#666] font-mono mt-auto pt-1">
+                        {source.sourceName && (
+                          <span className="uppercase tracking-wide">{source.sourceName}</span>
+                        )}
+                        {source.publicationDate && (
+                          <span className="flex items-center gap-1 border-l border-black/[0.1] pl-3">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(source.publicationDate).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                
+                {message.retrieval.notice && (
+                  <p className="mt-4 text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200">
+                    <AlertCircle className="h-3 w-3 inline mr-1" />
+                    {message.retrieval.notice}
+                  </p>
+                )}
+                <div className="mt-4 text-[10px] text-[#888] font-mono uppercase flex items-center gap-1.5">
+                  <Clock className="h-3 w-3" />
+                  Retrieved at {new Date(message.retrieval.retrievedAt).toLocaleString()}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -164,7 +283,7 @@ function CIOComponent() {
       id: "welcome-msg",
       role: "ai",
       content:
-        "Operator verified. I am the Sarvam AI Intelligence Officer. How can I assist with your investigation today?",
+        "Operator verified.\n\nI am the Sarvam AI Intelligence Officer. How can I assist with your investigation today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -201,7 +320,7 @@ function CIOComponent() {
           role: "ai",
           content:
             error.message ||
-            "SYSTEM ERROR: Connection to Sarvam AI network failed. Please verify API availability.",
+            "SYSTEM ERROR: Connection to intelligence network failed. Please verify API availability and try again.",
           isError: true,
         },
       ]);
@@ -236,45 +355,50 @@ function CIOComponent() {
     <AppShell title="Intelligence Officer" subtitle="Sarvam-powered Generative AI Assistant">
       <div className="p-4 md:p-6 lg:p-8 flex flex-col h-[calc(100vh-100px)] max-w-5xl mx-auto">
         {/* Main Chat Interface */}
-        <div className="flex-1 bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div className="flex-1 bg-white border border-black/[0.06] rounded-2xl shadow-xl flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-slate-800/80 border-b border-white/10 p-4 flex items-center justify-between z-10">
+          <div className="bg-[#f8f9fa] border-b border-black/[0.06] p-4 flex items-center justify-between z-10">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <div className="p-2 bg-purple-500/20 rounded-lg border border-purple-500/30">
-                  <Sparkles className="h-5 w-5 text-purple-400" />
+                <div className="p-2 bg-[#7c3aed]/10 rounded-lg border border-[#7c3aed]/20">
+                  <Sparkles className="h-5 w-5 text-[#7c3aed]" />
                 </div>
-                <span className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald-500 border-2 border-slate-800 rounded-full"></span>
+                <span className="absolute -bottom-1 -right-1 h-3 w-3 bg-[#16a34a] border-2 border-white rounded-full"></span>
               </div>
               <div>
-                <h2 className="text-sm font-bold text-white">Sarvam AI Core</h2>
-                <p className="text-xs text-slate-400">Intelligence & Analysis Module</p>
+                <h2 className="text-sm font-bold text-[#111]">Sarvam AI Core</h2>
+                <p className="text-xs text-[#666] font-mono uppercase tracking-wider mt-0.5">Intelligence Module Active</p>
               </div>
             </div>
 
             <button
               onClick={() => setMessages([messages[0]])}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors flex items-center"
+              className="px-3 py-1.5 text-[#666] hover:text-[#111] hover:bg-black/[0.04] border border-transparent hover:border-black/[0.06] rounded-lg transition-all flex items-center"
               title="Reset Conversation"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              <span className="text-xs font-medium">Clear Cache</span>
+              <span className="text-xs font-semibold">Clear Buffer</span>
             </button>
           </div>
 
           {/* Chat History Area */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
             {messages.length === 1 && (
-              <div className="flex flex-wrap gap-2 mb-8 justify-center mt-4">
-                {SUGGESTED_PROMPTS.map((prompt, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSend(prompt)}
-                    className="text-xs bg-white/5 hover:bg-purple-500/20 text-slate-300 hover:text-purple-200 border border-white/10 hover:border-purple-500/30 rounded-full px-4 py-2 transition-all"
-                  >
-                    "{prompt}"
-                  </button>
-                ))}
+              <div className="flex flex-col items-center justify-center mb-8 mt-4 space-y-4">
+                <p className="text-xs font-semibold text-[#888] uppercase tracking-widest text-center">
+                  Suggested Intelligence Queries
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center max-w-2xl">
+                  {SUGGESTED_PROMPTS.map((prompt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSend(prompt)}
+                      className="text-sm bg-white hover:bg-[#f8f9fa] text-[#444] hover:text-[#111] border border-black/[0.06] hover:border-black/[0.15] shadow-sm hover:shadow rounded-lg px-4 py-2 transition-all text-left"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -283,18 +407,16 @@ function CIOComponent() {
             ))}
 
             {chatMutation.isPending && (
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <TypingIndicator />
-              </div>
+              <TypingIndicator />
             )}
 
             {/* Invisible div to scroll to */}
-            <div ref={messagesEndRef} className="h-1" />
+            <div ref={messagesEndRef} className="h-4" />
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-slate-800/50 border-t border-white/10">
-            <div className="relative flex items-center">
+          <div className="p-4 bg-[#f8f9fa] border-t border-black/[0.06]">
+            <div className="relative flex items-center shadow-sm rounded-xl bg-white border border-black/[0.08] focus-within:border-[#111] focus-within:ring-2 focus-within:ring-[#111]/20 transition-all">
               <input
                 type="text"
                 value={input}
@@ -302,12 +424,12 @@ function CIOComponent() {
                 onKeyDown={handleKeyDown}
                 placeholder="Query the intelligence network..."
                 disabled={chatMutation.isPending}
-                className="w-full bg-slate-900 border border-white/10 rounded-xl py-4 pl-4 pr-14 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none placeholder:text-slate-500 disabled:opacity-50 transition-all shadow-inner"
+                className="w-full bg-transparent py-4 pl-4 pr-14 text-sm text-[#111] outline-none placeholder:text-[#888] disabled:opacity-50"
               />
               <button
                 onClick={() => handleSend()}
                 disabled={!input.trim() || chatMutation.isPending}
-                className="absolute right-2 p-2 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 text-white rounded-lg transition-colors disabled:cursor-not-allowed shadow-md"
+                className="absolute right-2 p-2 bg-[#111] hover:bg-[#333] disabled:bg-[#ddd] disabled:text-[#aaa] text-white rounded-lg transition-colors shadow-sm"
               >
                 {chatMutation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -316,8 +438,23 @@ function CIOComponent() {
                 )}
               </button>
             </div>
-            <div className="text-center mt-2">
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
+            
+            {/* Error Retry Option */}
+            {chatMutation.isError && (
+              <div className="mt-3 flex justify-center">
+                <button
+                  onClick={() => handleSend(messages[messages.length - 1].content)}
+                  className="text-xs font-semibold text-red-600 hover:text-red-700 flex items-center bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition-colors"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1.5" />
+                  Retry Failed Connection
+                </button>
+              </div>
+            )}
+            
+            <div className="text-center mt-3">
+              <span className="text-[10px] text-[#888] uppercase tracking-widest font-semibold flex items-center justify-center gap-1">
+                <Database className="h-3 w-3" />
                 Powered by Sarvam AI • Classified Intelligence Database
               </span>
             </div>
@@ -331,3 +468,4 @@ function CIOComponent() {
 export const Route = createFileRoute("/cio")({
   component: CIOComponent,
 });
+

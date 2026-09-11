@@ -71,7 +71,7 @@ function KPICard({
   value,
   icon: Icon,
   trend,
-  trendColor = "text-emerald-400",
+  trendColor = "text-emerald-600",
 }: {
   title: string;
   value: string | number;
@@ -82,16 +82,16 @@ function KPICard({
   return (
     <div
       title={`${title}: ${value}`}
-      className="intelligence-card intelligence-card-hover bg-slate-900/50 backdrop-blur-md border border-white/10 p-6 rounded-xl shadow-lg"
+      className="intelligence-card intelligence-card-hover bg-white/80 backdrop-blur-sm border border-black/[0.06] p-6 rounded-xl shadow-lg"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-slate-400">{title}</h3>
-        <div className="p-2 bg-blue-500/10 rounded-lg">
-          <Icon className="h-5 w-5 text-blue-400" />
+        <h3 className="text-sm font-medium text-[#666]">{title}</h3>
+        <div className="p-2 bg-[#0891b2]/10 rounded-lg">
+          <Icon className="h-5 w-5 text-[#0891b2]" />
         </div>
       </div>
       <div className="flex items-baseline space-x-2">
-        <span className="text-2xl font-bold text-white">
+        <span className="text-2xl font-bold text-[#111]">
           <AnimatedMetric value={value} />
         </span>
         {trend && <span className={`text-xs font-medium ${trendColor}`}>{trend}</span>}
@@ -113,11 +113,11 @@ const BRIEFING_SECTIONS: Array<{ key: keyof ExecutiveBriefing; label: string }> 
 function riskClasses(riskLevel: string): string {
   const risk = riskLevel.toLowerCase();
   if (risk.includes("critical") || risk.includes("high"))
-    return "text-red-400 border-red-500/30 bg-red-500/10";
+    return "text-red-600 border-red-500/30 bg-red-500/10";
   if (risk.includes("moderate") || risk.includes("medium"))
-    return "text-amber-300 border-amber-500/30 bg-amber-500/10";
-  if (risk.includes("low")) return "text-emerald-300 border-emerald-500/30 bg-emerald-500/10";
-  return "text-slate-300 border-white/10 bg-white/5";
+    return "text-amber-600 border-amber-500/30 bg-amber-500/10";
+  if (risk.includes("low")) return "text-emerald-600 border-emerald-500/30 bg-emerald-500/10";
+  return "text-[#444] border-black/[0.06] bg-black/[0.02]";
 }
 
 function AnimatedSeverityBar({ score, tone }: { score: number; tone: string }) {
@@ -185,7 +185,7 @@ function ExecutiveBriefingCard({
   if (isLoading) {
     return (
       <div
-        className="intelligence-card rounded-xl border border-white/10 bg-slate-900/50 p-6"
+        className="intelligence-card rounded-xl border border-black/[0.06] bg-white/80 p-6"
         aria-label="Loading executive intelligence briefing"
       >
         <div className="mb-5 flex items-center gap-3">
@@ -211,7 +211,7 @@ function ExecutiveBriefingCard({
 
   if (error || !briefing) {
     return (
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-[#92400e]">
         Executive briefing is temporarily unavailable. Existing dashboard analytics remain
         available.
       </div>
@@ -229,15 +229,15 @@ function ExecutiveBriefingCard({
     : 0;
 
   return (
-    <section className="intelligence-card intelligence-card-hover rounded-xl border border-white/10 bg-slate-900/60 p-6 shadow-lg backdrop-blur-md page-enter">
+    <section className="intelligence-card intelligence-card-hover rounded-xl border border-black/[0.06] bg-white/60 p-6 shadow-lg backdrop-blur-md page-enter">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-2">
-            <ShieldCheck className="h-5 w-5 text-cyan-300" />
+          <div className="rounded-lg border border-[#0891b2]/20 bg-cyan-500/10 p-2">
+            <ShieldCheck className="h-5 w-5 text-[#0891b2]" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Executive Intelligence Briefing</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-lg font-bold text-[#111]">Executive Intelligence Briefing</h2>
+            <p className="text-xs text-[#666]">
               Current public-source assessment for decision-makers
             </p>
           </div>
@@ -245,7 +245,7 @@ function ExecutiveBriefingCard({
         <button
           onClick={onRefresh}
           disabled={isFetching}
-          className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/10 hover:text-cyan-200 active:translate-y-0 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg border border-black/[0.06] px-3 py-2 text-xs font-semibold text-[#444] transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/10 hover:text-[#0891b2] active:translate-y-0 disabled:opacity-50"
           title="Refresh executive briefing"
           aria-label="Refresh executive briefing"
         >
@@ -259,33 +259,33 @@ function ExecutiveBriefingCard({
         >
           Risk: {briefing.riskLevel}
         </span>
-        <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-blue-200">
+        <span className="rounded-full border border-blue-500/30 bg-[#0891b2]/10 px-3 py-1 text-[#0c4a6e]">
           Confidence: {briefing.confidence}
         </span>
         <span
           title={`Last updated ${new Date(briefing.retrievalTimestamp).toLocaleString()}`}
-          className="flex items-center gap-2 text-slate-400"
+          className="flex items-center gap-2 text-[#666]"
         >
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]" />{" "}
-          LIVE <span className="text-slate-500">· updated {relativeUpdated}</span>
+          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" />{" "}
+          LIVE <span className="text-[#888]">· updated {relativeUpdated}</span>
         </span>
-        <span className="text-slate-500">
+        <span className="text-[#888]">
           {briefing.sources.length} active sources · feeds synchronized
         </span>
       </div>
 
       {isFetching && (
         <div
-          className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3"
+          className="mt-4 rounded-lg border border-cyan-200 bg-cyan-50 p-3"
           role="status"
           aria-live="polite"
         >
-          <p className="text-xs font-semibold text-cyan-200">Analyzing intelligence...</p>
+          <p className="text-xs font-semibold text-[#0891b2]">Analyzing intelligence...</p>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             {refreshSteps.map((step, index) => (
               <span
                 key={step}
-                className={`text-[11px] ${index <= refreshProgress ? "text-emerald-300" : "text-slate-500"}`}
+                className={`text-[11px] ${index <= refreshProgress ? "text-emerald-600" : "text-[#888]"}`}
               >
                 {index <= refreshProgress ? "✓" : "○"} {step}
               </span>
@@ -295,38 +295,38 @@ function ExecutiveBriefingCard({
       )}
 
       {briefing.notice && (
-        <p className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-200">
+        <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-[#92400e]">
           {briefing.notice}
         </p>
       )}
 
       {briefing.confidenceEvidence && (
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500">Confidence score</p>
-            <p className="mt-1 text-xl font-bold text-cyan-300">
+          <div className="rounded-lg border border-cyan-200 bg-cyan-50 p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#888]">Confidence score</p>
+            <p className="mt-1 text-xl font-bold text-[#0891b2]">
               {briefing.confidenceEvidence.score}/100
             </p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500">Sources</p>
-            <p className="mt-1 text-xl font-bold text-white">
+          <div className="rounded-lg border border-black/[0.06] bg-[#f8f8f8] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#888]">Sources</p>
+            <p className="mt-1 text-xl font-bold text-[#111]">
               {briefing.confidenceEvidence.sourceCount}
             </p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500">Evidence quality</p>
-            <p className="mt-1 text-sm font-bold text-slate-200">
+          <div className="rounded-lg border border-black/[0.06] bg-[#f8f8f8] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#888]">Evidence quality</p>
+            <p className="mt-1 text-sm font-bold text-[#111]">
               {briefing.confidenceEvidence.evidenceQuality}
             </p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-slate-950/40 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500">Recency</p>
-            <p className="mt-1 text-sm font-bold text-slate-200">
+          <div className="rounded-lg border border-black/[0.06] bg-[#f8f8f8] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#888]">Recency</p>
+            <p className="mt-1 text-sm font-bold text-[#111]">
               {briefing.confidenceEvidence.recency}
             </p>
           </div>
-          <p className="col-span-2 text-xs leading-5 text-slate-400 md:col-span-4">
+          <p className="col-span-2 text-xs leading-5 text-[#666] md:col-span-4">
             {briefing.confidenceEvidence.assessment}
           </p>
         </div>
@@ -338,23 +338,23 @@ function ExecutiveBriefingCard({
           return (
             <article
               key={key}
-              className="intelligence-card intelligence-card-hover rounded-lg border border-white/10 bg-slate-950/40 page-enter"
+              className="intelligence-card intelligence-card-hover rounded-lg border border-black/[0.06] bg-[#f8f8f8] page-enter"
               style={{ animationDelay: `${sectionIndex * 45}ms` }}
             >
               <button
                 onClick={() => setExpanded((current) => ({ ...current, [key]: !isExpanded }))}
-                className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-white/5 active:bg-white/10"
+                className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-black/5 active:bg-black/10"
               >
-                <span className="text-sm font-semibold text-slate-200">{label}</span>
+                <span className="text-sm font-semibold text-[#111]">{label}</span>
                 <ChevronDown
-                  className={`h-4 w-4 text-slate-500 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 text-[#888] transition-transform ${isExpanded ? "rotate-180" : ""}`}
                 />
               </button>
               <div
                 className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
               >
                 <div className="min-h-0 overflow-hidden">
-                  <p className="border-t border-white/5 px-4 pb-4 pt-3 text-sm leading-6 text-slate-400">
+                  <p className="border-t border-black/[0.04] px-4 pb-4 pt-3 text-sm leading-6 text-[#666]">
                     {String(briefing[key])}
                   </p>
                 </div>
@@ -364,27 +364,27 @@ function ExecutiveBriefingCard({
         })}
       </div>
 
-      <div className="mt-5 border-t border-white/10 pt-4">
+      <div className="mt-5 border-t border-black/[0.06] pt-4">
         {briefing.severityMatrix && briefing.severityMatrix.length > 0 && (
           <div className="mb-5">
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#888]">
               Intelligence Severity Matrix
             </h3>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
               {briefing.severityMatrix.map((item) => (
                 <div
                   key={item.category}
-                  className="intelligence-card intelligence-card-hover rounded-lg border border-white/10 bg-slate-950/40 p-3"
+                  className="intelligence-card intelligence-card-hover rounded-lg border border-black/[0.06] bg-[#f8f8f8] p-3"
                 >
-                  <div className="flex justify-between gap-2 text-xs text-slate-400">
+                  <div className="flex justify-between gap-2 text-xs text-[#666]">
                     <span>{item.category}</span>
                     <strong
                       className={
                         item.score >= 70
-                          ? "text-red-300"
+                          ? "text-red-600"
                           : item.score >= 40
-                            ? "text-amber-300"
-                            : "text-emerald-300"
+                            ? "text-amber-600"
+                            : "text-emerald-600"
                       }
                     >
                       {item.score}
@@ -394,10 +394,10 @@ function ExecutiveBriefingCard({
                     score={item.score}
                     tone={
                       item.score >= 70
-                        ? "bg-red-400"
+                        ? "bg-red-500"
                         : item.score >= 40
-                          ? "bg-amber-400"
-                          : "bg-emerald-400"
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
                     }
                   />
                 </div>
@@ -407,22 +407,22 @@ function ExecutiveBriefingCard({
         )}
         {briefing.threatTimeline && briefing.threatTimeline.length > 0 && (
           <div className="mb-5">
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#888]">
               Threat Timeline
             </h3>
-            <div className="space-y-3 border-l border-cyan-500/30 pl-4">
+            <div className="space-y-3 border-l border-[#0891b2]/20 pl-4">
               {briefing.threatTimeline.map((day) => (
                 <div key={day.date}>
-                  <p className="text-xs font-bold text-cyan-300">{day.date}</p>
+                  <p className="text-xs font-bold text-[#0891b2]">{day.date}</p>
                   {day.events.map((event) => (
                     <a
                       key={event.url}
                       href={event.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-1 block text-xs text-slate-400 hover:text-white"
+                      className="mt-1 block text-xs text-[#666] hover:text-[#111]"
                     >
-                      <span className="font-semibold text-slate-200">{event.title}</span>
+                      <span className="font-semibold text-[#111]">{event.title}</span>
                       <span className="ml-2">{event.summary}</span>
                     </a>
                   ))}
@@ -432,12 +432,12 @@ function ExecutiveBriefingCard({
           </div>
         )}
         <ExecutiveIntelligenceCenter briefing={briefing} />
-        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#888]">
           Sources Consulted
         </h3>
         <div className="space-y-2">
           {briefing.sources.length === 0 ? (
-            <p className="text-xs text-slate-500">No public sources were verified.</p>
+            <p className="text-xs text-[#888]">No public sources were verified.</p>
           ) : (
             briefing.sources.map((source) => (
               <a
@@ -445,12 +445,12 @@ function ExecutiveBriefingCard({
                 href={source.url}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-start gap-2 text-xs text-slate-300 hover:text-white"
+                className="flex items-start gap-2 text-xs text-[#444] hover:text-[#111]"
               >
                 <ExternalLink className="mt-0.5 h-3 w-3 flex-shrink-0" />
                 <span>
                   {source.title}
-                  <span className="ml-2 text-slate-500">
+                  <span className="ml-2 text-[#888]">
                     {source.publicationDate
                       ? new Date(source.publicationDate).toLocaleDateString()
                       : "Date unavailable"}
@@ -585,13 +585,13 @@ function DashboardComponent() {
   });
 
   const threatLevel = forecastData?.forecasted_threat_level?.toUpperCase() || "ANALYZING";
-  let threatColor = "text-slate-400";
+  let threatColor = "text-[#666]";
   if (threatLevel === "HIGH" || threatLevel === "CRITICAL")
     threatColor = "text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]";
   else if (threatLevel === "MEDIUM")
     threatColor = "text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]";
   else if (threatLevel === "LOW")
-    threatColor = "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]";
+    threatColor = "text-emerald-600 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]";
 
   // --- 3. PDF EXPORT ---
   const handleExportPDF = async () => {
@@ -856,15 +856,15 @@ function DashboardComponent() {
       subtitle="Real-time national security metrics and threat vectors."
     >
       <div className="p-6 md:p-8 max-w-7xl mx-auto animate-in fade-in duration-500">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-slate-900/50 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white/80 p-4 rounded-xl border border-black/[0.06] backdrop-blur-sm">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-500/20 rounded-lg">
-              <MapPin className="h-5 w-5 text-blue-400" />
+              <MapPin className="h-5 w-5 text-[#0891b2]" />
             </div>
             <select
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-slate-950 border border-white/20 rounded-lg px-4 py-2 text-sm text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-slate-900 transition-colors"
+              className="bg-slate-950 border border-black/[0.08] rounded-lg px-4 py-2 text-sm text-[#111] font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-white transition-colors"
             >
               <option value="All">National Overview (All Regions)</option>
               {[...statesData]
@@ -880,7 +880,7 @@ function DashboardComponent() {
           <button
             onClick={handleExportPDF}
             disabled={isExporting || isLoading}
-            className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 shadow-lg shadow-blue-900/20"
+            className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-[#111] rounded-lg text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 shadow-lg shadow-blue-900/20"
           >
             {isExporting ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -901,18 +901,18 @@ function DashboardComponent() {
           />
         </div>
 
-        <div ref={reportRef} className="space-y-6 pb-4 bg-[#0a0f1c] p-2 rounded-xl">
+        <div ref={reportRef} className="space-y-6 pb-4 bg-[#fafafa] p-2 rounded-xl">
           {isLoading ? (
-            <div className="h-64 flex items-center justify-center border border-white/5 rounded-xl bg-slate-900/20">
+            <div className="h-64 flex items-center justify-center border border-black/[0.04] rounded-xl bg-white/20">
               <div className="flex flex-col items-center space-y-4">
                 <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-                <span className="text-slate-400 font-mono text-sm uppercase tracking-widest">
+                <span className="text-[#666] font-mono text-sm uppercase tracking-widest">
                   Compiling Database Vectors...
                 </span>
               </div>
             </div>
           ) : error ? (
-            <div className="p-4 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400">
+            <div className="p-4 bg-red-900/20 border border-red-500/30 rounded-lg text-red-600">
               Failed to load dashboard metrics. Ensure the core API is online.
             </div>
           ) : (
@@ -926,7 +926,7 @@ function DashboardComponent() {
                     <BrainCircuit className="h-8 w-8 text-indigo-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white tracking-wide">
+                    <h2 className="text-xl font-bold text-[#111] tracking-wide">
                       Predictive AI Threat Engine
                     </h2>
                     <p className="text-indigo-200/60 text-sm mt-1">
@@ -936,7 +936,7 @@ function DashboardComponent() {
                 </div>
 
                 <div className="relative z-10 flex flex-col items-end">
-                  <span className="text-xs font-mono text-slate-400 mb-1 uppercase tracking-widest">
+                  <span className="text-xs font-mono text-[#666] mb-1 uppercase tracking-widest">
                     Projected Threat Level
                   </span>
                   {isForecasting ? (
@@ -960,7 +960,7 @@ function DashboardComponent() {
                   value={totalIncidents.toLocaleString()}
                   icon={AlertTriangle}
                   trend={selectedRegion === "All" ? "National Total" : "State Total"}
-                  trendColor="text-blue-400"
+                  trendColor="text-[#0891b2]"
                 />
                 <KPICard
                   title="Avg Crime Rate"
@@ -985,16 +985,16 @@ function DashboardComponent() {
                   icon={ShieldAlert}
                   trend={selectedRegion === "All" ? "Critical" : ""}
                   trendColor={
-                    activeData[0]?.risk === "Critical" ? "text-red-400" : "text-orange-400"
+                    activeData[0]?.risk === "Critical" ? "text-red-600" : "text-orange-400"
                   }
                 />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
-                <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 p-6 rounded-xl shadow-lg">
+                <div className="bg-white/80 backdrop-blur-sm border border-black/[0.06] p-6 rounded-xl shadow-lg">
                   <div className="flex items-center space-x-2 mb-6">
-                    <TrendingUp className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-base font-bold text-white">
+                    <TrendingUp className="h-5 w-5 text-[#0891b2]" />
+                    <h3 className="text-base font-bold text-[#111]">
                       {selectedRegion === "All"
                         ? "Highest Crime Rate Regions"
                         : `${selectedRegion} Crime Rate`}
@@ -1014,9 +1014,9 @@ function DashboardComponent() {
                         <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                         <RechartsTooltip
                           contentStyle={{
-                            backgroundColor: "#0f172a",
-                            borderColor: "#1e293b",
-                            color: "#f8fafc",
+                            backgroundColor: "#ffffff",
+                            borderColor: "#e5e7eb",
+                            color: "#111111",
                           }}
                           itemStyle={{ color: "#60a5fa" }}
                         />
@@ -1026,10 +1026,10 @@ function DashboardComponent() {
                   </div>
                 </div>
 
-                <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 p-6 rounded-xl shadow-lg">
+                <div className="bg-white/80 backdrop-blur-sm border border-black/[0.06] p-6 rounded-xl shadow-lg">
                   <div className="flex items-center space-x-2 mb-6">
-                    <ShieldAlert className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-base font-bold text-white">
+                    <ShieldAlert className="h-5 w-5 text-[#0891b2]" />
+                    <h3 className="text-base font-bold text-[#111]">
                       {selectedRegion === "All"
                         ? "National Threat Distribution"
                         : `${selectedRegion} Threat Profile`}
@@ -1054,9 +1054,9 @@ function DashboardComponent() {
                         </Pie>
                         <RechartsTooltip
                           contentStyle={{
-                            backgroundColor: "#0f172a",
-                            borderColor: "#1e293b",
-                            color: "#f8fafc",
+                            backgroundColor: "#ffffff",
+                            borderColor: "#e5e7eb",
+                            color: "#111111",
                           }}
                         />
                       </PieChart>
@@ -1064,10 +1064,10 @@ function DashboardComponent() {
                   </div>
                 </div>
 
-                <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 p-6 rounded-xl shadow-lg lg:col-span-2">
+                <div className="bg-white/80 backdrop-blur-sm border border-black/[0.06] p-6 rounded-xl shadow-lg lg:col-span-2">
                   <div className="flex items-center space-x-2 mb-6">
-                    <FileText className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-base font-bold text-white">
+                    <FileText className="h-5 w-5 text-[#0891b2]" />
+                    <h3 className="text-base font-bold text-[#111]">
                       {selectedRegion === "All"
                         ? "Investigation Bottlenecks (Lowest Chargesheet Rates)"
                         : `${selectedRegion} Investigation Efficiency`}
@@ -1093,9 +1093,9 @@ function DashboardComponent() {
                         />
                         <RechartsTooltip
                           contentStyle={{
-                            backgroundColor: "#0f172a",
-                            borderColor: "#1e293b",
-                            color: "#f8fafc",
+                            backgroundColor: "#ffffff",
+                            borderColor: "#e5e7eb",
+                            color: "#111111",
                           }}
                           itemStyle={{ color: "#ef4444" }}
                         />

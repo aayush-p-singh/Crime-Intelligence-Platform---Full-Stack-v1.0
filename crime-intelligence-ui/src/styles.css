@@ -68,6 +68,18 @@
   --bg-page: #fafafa;
   --bg-section: #ffffff;
   --border-default: rgba(0, 0, 0, 0.06);
+
+  /* Intelligence Accent Tokens */
+  --intel-cyan: #0891b2;
+  --intel-cyan-light: rgba(8, 145, 178, 0.08);
+  --intel-orange: #f59e0b;
+  --intel-orange-light: rgba(245, 158, 11, 0.08);
+  --intel-red: #dc2626;
+  --intel-red-light: rgba(220, 38, 38, 0.08);
+  --intel-green: #16a34a;
+  --intel-green-light: rgba(22, 163, 74, 0.08);
+  --intel-purple: #7c3aed;
+  --intel-purple-light: rgba(124, 58, 237, 0.08);
 }
 
 @layer base {
@@ -138,7 +150,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.2;
+  opacity: 0.18;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
@@ -193,7 +205,61 @@
 }
 
 /* ==========================================================================
-   CARDS & CONTAINERS
+   INTEL CARDS & CONTAINERS
+   ========================================================================== */
+.intel-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  transition: all 0.4s var(--ease-smooth);
+}
+
+.intel-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  z-index: 1;
+}
+
+.intel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.intel-card-dark {
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.intel-section {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 1.25rem;
+}
+
+.intel-metric {
+  background: #f8f8f8;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+/* ==========================================================================
+   LEGACY CARDS (preserved for compatibility)
    ========================================================================== */
 .premium-card {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(252, 252, 252, 0.85) 100%);
@@ -223,7 +289,6 @@
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Spotlight effect applied via React later */
 .card-spotlight {
   position: absolute;
   inset: 0;
@@ -239,6 +304,91 @@
 }
 .premium-card:hover .card-spotlight {
   opacity: 1;
+}
+
+/* ==========================================================================
+   INTEL BADGES
+   ========================================================================== */
+.intel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.intel-badge-critical {
+  color: var(--intel-red);
+  background: var(--intel-red-light);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.intel-badge-high {
+  color: #ea580c;
+  background: rgba(234, 88, 12, 0.08);
+  border-color: rgba(234, 88, 12, 0.2);
+}
+
+.intel-badge-medium {
+  color: var(--intel-orange);
+  background: var(--intel-orange-light);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.intel-badge-low {
+  color: var(--intel-green);
+  background: var(--intel-green-light);
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+/* ==========================================================================
+   INTEL FORM CONTROLS
+   ========================================================================== */
+.intel-select {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #111;
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.intel-select:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.intel-select:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.intel-input {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  color: #111;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.intel-input:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.intel-input::placeholder {
+  color: #999;
 }
 
 /* ==========================================================================
@@ -328,6 +478,166 @@
   animation: radar-ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scanline-move {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+}
+
+.shimmer-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 0.5rem;
+}
+
+.shimmer-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Legacy skeleton for dark contexts */
+.briefing-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+}
+
+.briefing-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--saffron), transparent);
+  animation: scanline-move 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s var(--ease-smooth) both;
+}
+
+.animate-fade-scale {
+  animation: fade-scale 0.4s var(--ease-smooth) both;
+}
+
+.page-transition {
+  animation: fade-scale 0.35s var(--ease-smooth) both;
+}
+
+.gradient-saffron {
+  height: 2px;
+  background: linear-gradient(90deg, #ff9933, #138808);
+  border-radius: 1px;
+}
+
+.gradient-border {
+  background: linear-gradient(135deg, #ff9933, #138808, #0891b2);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.graph-canvas {
+  background: #0b0b0d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.typing-dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #999;
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
 .map-outline-subtle {
   stroke: rgba(0, 0, 0, 0.03);
   stroke-width: 1px;
@@ -360,6 +670,40 @@
 }
 .hover-lift:hover {
   transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   DARK CONTEXT CARDS (for dashboard/map/graph legacy)
+   ========================================================================== */
+.intelligence-card {
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.intelligence-card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.page-enter {
+  animation: slide-up 0.4s var(--ease-smooth) both;
+}
+
+/* Map heat region styling */
+.map-heat-region {
+  transition: all 0.3s ease;
+}
+
+@keyframes risk-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.map-risk-pulse {
+  animation: risk-pulse 2s ease-in-out infinite;
 }
 
 /* Reduced Motion */
