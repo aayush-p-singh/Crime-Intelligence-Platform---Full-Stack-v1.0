@@ -25,20 +25,27 @@ from services.threats.threat_intelligence_service import ThreatIntelligenceServi
 # ==========================================================
 # Flask Initialization
 # ==========================================================
-from flask import Flask
+import os
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
+
+# Explicitly allowed frontend origins
+ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+    "https://crime-intel-full-stack.vercel.app"
+]
+
+env_origin = os.environ.get("ALLOWED_ORIGIN")
+if env_origin:
+    ALLOWED_ORIGINS.append(env_origin)
+
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=True)
 
 briefing_service = create_default_service()
 threat_intelligence_service = ThreatIntelligenceService()
-from flask import Flask
-from flask_cors import CORS
-
-app = Flask(__name__)
-
-# Allow all frontend origins
-CORS(app, resources={r"/*": {"origins": "*"}})
 
 # ==========================================================
 # Database Connection
@@ -136,9 +143,18 @@ def compare_states(state1, state2):
 
 @app.route("/api/officer", methods=["POST"])
 def officer_chat():
-    # (Kept your logic, just ensured it's an API route)
-    data = request.json
-    return jsonify(officer.chat_with_metadata(data.get("message", "")))
+    try:
+        data = request.json or {}
+        message = data.get("message", "")
+        return jsonify(officer.chat_with_metadata(message))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        # Return a controlled error response with 200 OK or handled 500?
+        # The user wants "no HTTP 500" and a controlled response.
+        # Actually, if we return 500 with JSON, apiFetch throws the JSON's message.
+        # Let's return 500 so apiFetch catches it and displays our custom message.
+        return jsonify({"error": True, "message": "Intelligence service temporarily unavailable."}), 500
 
 @app.route("/api/executive-briefing", methods=["GET"])
 def executive_briefing():

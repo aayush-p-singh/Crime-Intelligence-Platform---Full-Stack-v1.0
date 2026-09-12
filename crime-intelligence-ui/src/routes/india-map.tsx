@@ -235,7 +235,7 @@ function IndiaMapComponent() {
             <select
               value={threatFilter}
               onChange={(event) => setThreatFilter(event.target.value as ThreatFilter)}
-              className="rounded-lg border border-black/[0.06] bg-slate-950 px-3 py-2 text-xs text-[#444] outline-none"
+              className="rounded-lg border border-black/[0.06] bg-white px-3 py-2 text-xs text-[#444] outline-none"
             >
               {THREAT_FILTERS.map((filter) => (
                 <option key={filter.value} value={filter.value}>

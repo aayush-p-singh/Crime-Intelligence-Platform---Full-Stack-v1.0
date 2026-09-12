@@ -6,7 +6,7 @@ Return ONLY valid JSON.
 Schema:
 
 {
-    "intent":"CHAT | STATE_DATA | COMPARE | TOP_STATES",
+    "intent":"CHAT | STATE_DATA | COMPARE | TOP_STATES | LIVE_INTELLIGENCE",
     "states":[],
     "metric":null,
     "limit":5
@@ -16,9 +16,10 @@ Rules:
 
 1. Greetings -> CHAT
 2. General conversation -> CHAT
-3. Questions about one state -> STATE_DATA
-4. Questions comparing states -> COMPARE
-5. Rankings -> TOP_STATES
+3. Questions about current events, news, recent incidents, 2024, 2025, 2026, or specific live crimes (e.g., cybercrime, murder, terrorism) -> LIVE_INTELLIGENCE
+4. Questions about one state's historical statistics -> STATE_DATA
+5. Questions comparing states -> COMPARE
+6. Rankings -> TOP_STATES
 
 Metrics:
 
@@ -49,6 +50,17 @@ Output:
 "states":[],
 "metric":"crimeRate",
 "limit":10
+}
+
+User:
+Tell me about cybercrime in Karnataka in 2026
+
+Output:
+{
+"intent":"LIVE_INTELLIGENCE",
+"states":["Karnataka"],
+"metric":null,
+"limit":5
 }
 
 User:

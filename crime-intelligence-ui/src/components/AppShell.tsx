@@ -6,14 +6,13 @@ import {
   BarChart3,
   Network,
   MessageSquare,
-  Search,
+  Info,
   Bell,
   Menu,
   LogOut,
   ChevronDown,
   Layers,
   Sparkles,
-  Command,
   Clock,
   X,
 } from "lucide-react";
@@ -35,49 +34,8 @@ const navItems = [
   { path: "/cio", label: "Intelligence Officer", icon: MessageSquare, code: "IO" },
 ];
 
-const SEARCH_PHRASES = [
-  "Search intelligence...",
-  "Search entities...",
-  "Search jurisdictions...",
-  "Search threats...",
-];
 
-function useCyclingPlaceholder(phrases: string[]) {
-  const [currentText, setCurrentText] = useState("");
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    const typeSpeed = 50;
-    const deleteSpeed = 30;
-    const pauseTime = 3000;
-    const currentPhrase = phrases[phraseIndex];
-
-    const timer = setTimeout(
-      () => {
-        if (!isDeleting) {
-          if (currentText.length < currentPhrase.length) {
-            setCurrentText(currentPhrase.slice(0, currentText.length + 1));
-          } else {
-            setTimeout(() => setIsDeleting(true), pauseTime);
-          }
-        } else {
-          if (currentText.length > 0) {
-            setCurrentText(currentPhrase.slice(0, currentText.length - 1));
-          } else {
-            setIsDeleting(false);
-            setPhraseIndex((prev) => (prev + 1) % phrases.length);
-          }
-        }
-      },
-      isDeleting ? deleteSpeed : typeSpeed,
-    );
-
-    return () => clearTimeout(timer);
-  }, [currentText, isDeleting, phraseIndex, phrases]);
-
-  return currentText;
-}
 
 function useCurrentTime() {
   const [time, setTime] = useState(new Date());
@@ -91,14 +49,11 @@ function useCurrentTime() {
 export function AppShell({ children, title, subtitle }: AppShellProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchVal, setSearchVal] = useState("");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const placeholderText = useCyclingPlaceholder(SEARCH_PHRASES);
   const now = useCurrentTime();
 
   const formattedDate = now.toLocaleDateString("en-IN", {
@@ -332,25 +287,22 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
 
             <div className="hidden xl:block w-px h-5 bg-black/[0.06]" />
 
-            {/* Command Palette Search */}
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#999] stroke-[1.5]" />
-              <input
-                type="text"
-                value={searchVal}
-                onChange={(e) => setSearchVal(e.target.value)}
-                placeholder={isSearchFocused ? "Filter intel..." : placeholderText}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                className="bg-black/[0.03] border border-black/[0.05] rounded-lg py-1.5 pl-8 pr-12 text-[12px] font-medium text-[#111] placeholder:text-[#aaa] outline-none transition-all duration-300 focus:bg-white focus:border-[#111]/20 focus:shadow-sm hover:bg-white/80 focus:w-64 w-52"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-                <div className="flex items-center gap-0.5 bg-black/[0.04] px-1.5 py-0.5 rounded text-[#888]">
-                  <Command className="h-2.5 w-2.5" />
-                  <span className="text-[9px] font-bold">K</span>
-                </div>
+            {/* About CrimeIntel */}
+            <Link
+              to="/about"
+              className="hidden md:flex items-center gap-2 bg-black/[0.03] border border-black/[0.05] rounded-lg py-1.5 px-3 cursor-pointer transition-all duration-300 hover:bg-white/80 hover:border-black/[0.1] group w-52 no-underline"
+              aria-label="About CrimeIntel"
+            >
+              <Info className="h-3.5 w-3.5 text-[#999] stroke-[1.5] shrink-0 group-hover:text-[#666] transition-colors" />
+              <div className="flex flex-col items-start min-w-0">
+                <span className="text-[9px] font-mono font-semibold text-[#888] tracking-[0.1em] uppercase leading-tight">
+                  ABOUT CRIMEINTEL
+                </span>
+                <span className="text-[10px] text-[#aaa] font-medium leading-tight truncate w-full">
+                  Decision-ready intelligence
+                </span>
               </div>
-            </div>
+            </Link>
 
             <Link
               to="/cio"

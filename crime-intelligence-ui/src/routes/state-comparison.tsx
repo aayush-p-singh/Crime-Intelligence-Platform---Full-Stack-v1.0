@@ -49,35 +49,35 @@ function ComparisonCard({
   return (
     <div className="bg-black/[0.02] backdrop-blur-md border border-black/[0.06] rounded-xl p-4 flex flex-col justify-between">
       <h4 className="text-sm font-semibold text-[#666] mb-4">{label}</h4>
-      <div className="flex justify-between items-end">
-        <div className="flex flex-col">
-          <span className={`text-2xl font-bold ${is1Higher ? "text-[#0891b2]" : "text-[#444]"}`}>
+      <div className="flex justify-between items-end gap-2">
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className={`text-lg lg:text-xl xl:text-2xl font-bold tracking-tight truncate ${is1Higher ? "text-[#0891b2]" : "text-[#444]"}`}>
             {prefix}
             {value1.toLocaleString()}
             {suffix}
           </span>
-          <span className="text-xs text-[#888]">State 1</span>
+          <span className="text-xs text-[#888] truncate">State 1</span>
         </div>
 
         {diff !== 0 && (
-          <div className="flex flex-col items-center justify-center px-4">
-            <span className="text-xs font-mono text-[#666]">
+          <div className="flex flex-col items-center justify-center px-1 shrink-0">
+            <span className="text-[10px] sm:text-xs font-mono text-[#666] whitespace-nowrap">
               Δ {Math.abs(diff).toLocaleString()}
               {suffix}
             </span>
-            <div className="h-px w-12 bg-slate-600 my-1"></div>
+            <div className="h-px w-8 sm:w-12 bg-slate-600 my-1"></div>
           </div>
         )}
 
-        <div className="flex flex-col text-right">
+        <div className="flex flex-col text-right min-w-0 flex-1">
           <span
-            className={`text-2xl font-bold ${is2Higher ? "text-purple-400" : "text-[#444]"}`}
+            className={`text-lg lg:text-xl xl:text-2xl font-bold tracking-tight truncate ${is2Higher ? "text-purple-400" : "text-[#444]"}`}
           >
             {prefix}
             {value2.toLocaleString()}
             {suffix}
           </span>
-          <span className="text-xs text-[#888]">State 2</span>
+          <span className="text-xs text-[#888] truncate">State 2</span>
         </div>
       </div>
     </div>

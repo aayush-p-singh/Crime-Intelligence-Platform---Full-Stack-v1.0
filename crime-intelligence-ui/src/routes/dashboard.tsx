@@ -161,7 +161,7 @@ function ExecutiveBriefingCard({
   error: unknown;
   onRefresh: () => void;
 }) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ executiveSummary: true });
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [refreshStartedAt, setRefreshStartedAt] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -864,7 +864,7 @@ function DashboardComponent() {
             <select
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-slate-950 border border-black/[0.08] rounded-lg px-4 py-2 text-sm text-[#111] font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-white transition-colors"
+              className="bg-white border border-black/[0.08] rounded-lg px-4 py-2 text-sm text-[#111] font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-black/5 transition-colors"
             >
               <option value="All">National Overview (All Regions)</option>
               {[...statesData]
@@ -926,17 +926,17 @@ function DashboardComponent() {
                     <BrainCircuit className="h-8 w-8 text-indigo-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#111] tracking-wide">
+                    <h2 className="text-xl font-bold text-white tracking-wide">
                       Predictive AI Threat Engine
                     </h2>
-                    <p className="text-indigo-200/60 text-sm mt-1">
+                    <p className="text-white/80 text-sm mt-1">
                       Forecasting future trajectory based on live intelligence vectors
                     </p>
                   </div>
                 </div>
 
                 <div className="relative z-10 flex flex-col items-end">
-                  <span className="text-xs font-mono text-[#666] mb-1 uppercase tracking-widest">
+                  <span className="text-xs font-mono text-white/70 mb-1 uppercase tracking-widest">
                     Projected Threat Level
                   </span>
                   {isForecasting ? (

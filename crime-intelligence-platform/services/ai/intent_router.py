@@ -28,10 +28,15 @@ class IntentRouter:
                     "role": "user",
                     "content": message
                 }
-            ]
+            ],
+            max_tokens=2048
         )
 
-        content = response.choices[0].message.content.strip()
+        content = response.choices[0].message.content
+        if content is None:
+            content = ""
+            
+        content = content.strip()
 
         # Remove markdown fences if present
         content = content.replace("```json", "").replace("```", "").strip()

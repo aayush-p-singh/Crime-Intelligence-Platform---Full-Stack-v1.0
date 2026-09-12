@@ -208,23 +208,27 @@ Write like a professional intelligence officer briefing a senior official.
         "content": message
     })
 
-        response = client.chat.completions(
-            model="sarvam-105b",
-            messages=messages,
-            max_tokens=4096
-        )
-        
-        reply = response.choices[0].message.content or ""
-
-        self.history.append({
-        "role": "user",
-        "content": message
-    })
-
-        self.history.append({
-            "role": "assistant",
-            "content": reply
-    })
+        try:
+            response = client.chat.completions(
+                model="sarvam-105b",
+                messages=messages,
+                max_tokens=4096
+            )
+            
+            if not getattr(response, "choices", None):
+                logger.error("LLM returned empty choices or invalid response.")
+                reply = "I apologize, but I could not synthesize the intelligence at this moment."
+            else:
+                content = response.choices[0].message.content
+                finish_reason = getattr(response.choices[0], 'finish_reason', 'unknown')
+                logger.info(f"LLM finish_reason: {finish_reason}")
+                if not content:
+                    reply = "I apologize, but the intelligence synthesis failed or exceeded length."
+                else:
+                    reply = content
+        except Exception as e:
+            logger.error(f"Error calling LLM: {e}")
+            reply = "I apologize, but the intelligence service is temporarily unavailable."
 
         return reply 
     
@@ -234,13 +238,14 @@ Write like a professional intelligence officer briefing a senior official.
         """Handle a chatbot request and return the reply plus retrieval metadata."""
 
         original_message = message
-        retrieval = retrieval_service.retrieve(original_message)
-
+        
         route = router.detect(original_message)
-
         print(route)
-
         intent = route["intent"]
+
+        # Only require retrieval if the intent is LIVE_INTELLIGENCE
+        requires_retrieval = intent == "LIVE_INTELLIGENCE"
+        retrieval = retrieval_service.retrieve(original_message, force=requires_retrieval)
 
         if intent == "COMPARE":
             message = self.handle_compare(
@@ -353,23 +358,28 @@ Write like a professional intelligence officer briefing a senior official.
         - Professional intelligence analyst tone.
         """
 
-        response = client.chat.completions(
+        try:
+            response = client.chat.completions(
+                model="sarvam-105b",
+                messages=[
+                {
+                    "role":"system",
+                    "content":STATE_PROMPT
+                },
+                {
+                    "role":"user",
+                    "content":prompt
+                }
+                ]
+            )
+            
+            if not getattr(response, "choices", None):
+                return "Insight unavailable."
+            
+            content = response.choices[0].message.content
+            return content if content is not None else "Insight unavailable."
+        except Exception as e:
+            logger.error(f"Error generating insight: {e}")
+            return "Insight temporarily unavailable."
 
-            model="sarvam-105b",
-
-            messages=[
-            {
-                "role":"system",
-                "content":STATE_PROMPT
-            },
-            {
-                "role":"user",
-                "content":prompt
-            }
-        ],
-        max_tokens=4096
-    )
-
-        return response.choices[0].message.content
-
-officer = CrimeOfficer()    
+officer = CrimeOfficer()

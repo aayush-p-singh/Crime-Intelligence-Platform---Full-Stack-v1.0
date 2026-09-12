@@ -32,6 +32,10 @@ LIVE_INFORMATION_TERMS = (
     "international crime",
     "breaking",
     "campaign",
+    "news",
+    "2024",
+    "2025",
+    "2026",
 )
 
 
@@ -67,8 +71,8 @@ class RetrievalService:
         normalized = " ".join(message.lower().split())
         return any(term in normalized for term in LIVE_INFORMATION_TERMS)
 
-    def retrieve(self, message: str) -> RetrievalResult:
-        required = self.requires_retrieval(message)
+    def retrieve(self, message: str, force: bool = False) -> RetrievalResult:
+        required = force or self.requires_retrieval(message)
         result = RetrievalResult(
             required=required,
             query=message,
