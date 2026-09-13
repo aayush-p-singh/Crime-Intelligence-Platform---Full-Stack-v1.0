@@ -16,26 +16,39 @@ class Neo4jConnection:
         self.user = os.environ.get("NEO4J_USERNAME")
         self.password = os.environ.get("NEO4J_PASSWORD")
         
-        # 2. Force log the attempt (This will show in your Render logs!)
-        logger.info(f"Attempting to connect to Neo4j at: {self.uri}")
+        self._driver = None
         
         if not self.uri or not self.user or not self.password:
             logger.error("MISSING ENVIRONMENT VARIABLES!")
             raise ValueError("Environment variables are missing")
 
-        try:
-            self.driver = GraphDatabase.driver(
-                self.uri,
-                auth=(self.user, self.password)
-            )
-            self.driver.verify_connectivity()
-            logger.info("Successfully connected to Neo4j!")
-        except Exception as e:
-            logger.error(f"Failed to connect to Neo4j: {str(e)}")
-            raise e
+    @property
+    def driver(self):
+        """
+        Lazy initialization of the Neo4j driver.
+        This prevents the SSL state from being shared across Gunicorn worker forks,
+        which causes DECRYPTION_FAILED_OR_BAD_RECORD_MAC and ConnectionResetError.
+        """
+        if self._driver is None:
+            logger.info(f"Attempting to connect to Neo4j at: {self.uri}")
+            
+            try:
+                self._driver = GraphDatabase.driver(
+                    self.uri,
+                    auth=(self.user, self.password),
+                    max_connection_lifetime=200, # Drop stale connections faster
+                    keep_alive=True
+                )
+                self._driver.verify_connectivity()
+                logger.info("Successfully connected to Neo4j!")
+            except Exception as e:
+                logger.error(f"Failed to connect to Neo4j: {str(e)}")
+                raise e
+        return self._driver
 
     def close(self):
-        self.driver.close()
+        if self._driver:
+            self._driver.close()
 
     def run_query(self, query, **params):
         with self.driver.session() as session:
