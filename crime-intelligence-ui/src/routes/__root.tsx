@@ -4,6 +4,8 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BootScreen } from "../components/BootScreen";
+import { AuthProvider, useAuth } from "../hooks/useAuth";
 
 function NotFoundComponent() {
   return (
@@ -114,11 +117,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="app-route-enter">
-        <Outlet />
-      </div>
-      <BootScreen />
+      <AuthProvider>
+        <div className="app-route-enter">
+          <Outlet />
+        </div>
+        <BootScreen />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
-

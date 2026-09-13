@@ -175,27 +175,28 @@ function KnowledgeGraphComponent() {
       
       // 3. AI / Intelligence Nodes
       if (predictionData) {
-        if (predictionData.riskLevel || stateData.risk) {
+        const pdAny = predictionData as any;
+        if (pdAny.riskLevel || stateData.risk || predictionData.risk) {
           nodes.push({
             id: `${stateId}-risk`,
             label: "AI Threat Level",
             group: "AI",
             type: "prediction",
-            value: predictionData.riskLevel || stateData.risk,
-            risk_score: predictionData.riskScore
+            value: pdAny.riskLevel || stateData.risk || predictionData.risk,
+            risk_score: pdAny.riskScore || predictionData.confidence
           });
           links.push({ source: stateId, target: `${stateId}-risk`, type: "assessed_as" });
         }
         
-        if (predictionData.trend) {
+        if (pdAny.trend) {
           nodes.push({
             id: `${stateId}-trend`,
             label: "Forecast Trend",
             group: "AI",
             type: "prediction",
-            value: predictionData.trend,
-            growth_percent: `${predictionData.growthPercent}%`,
-            predicted_incidents: predictionData.predictedTotalCrime
+            value: pdAny.trend,
+            growth_percent: `${pdAny.growthPercent}%`,
+            predicted_incidents: pdAny.predictedTotalCrime
           });
           links.push({ source: stateId, target: `${stateId}-trend`, type: "forecasts" });
         }
