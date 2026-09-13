@@ -224,5 +224,89 @@ def threat_forecast():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@app.route("/api/voice/transcribe", methods=["POST"])
+def voice_transcribe():
+    if "audio" not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+        
+    try:
+        import logging
+        logger = logging.getLogger(__name__)
+        import tempfile
+        import os
+        from services import gnani_service
+
+        audio_file = request.files["audio"]
+        mime_type = audio_file.content_type
+        
+        logger.info(f"Received audio file for STT, mime_type: {mime_type}")
+        
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_in:
+            audio_file.save(temp_in.name)
+            temp_in_path = temp_in.name
+            
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_out:
+            temp_out_path = temp_out.name
+            
+        # Convert webm to wav
+        import av
+        with av.open(temp_in_path) as in_container:
+            in_stream = in_container.streams.audio[0]
+            with av.open(temp_out_path, 'w', format='wav') as out_container:
+                out_stream = out_container.add_stream('pcm_s16le', rate=16000)
+                for frame in in_container.decode(in_stream):
+                    frame.pts = None
+                    for packet in out_stream.encode(frame):
+                        out_container.mux(packet)
+                for packet in out_stream.encode(None):
+                    out_container.mux(packet)
+                    
+        # Send converted WAV to Gnani
+        result = gnani_service.transcribe_audio(temp_out_path)
+        
+        # Cleanup
+        os.unlink(temp_in_path)
+        os.unlink(temp_out_path)
+        
+        # Parse official response
+        success = result.get("success", False)
+        if not success:
+            logger.error(f"Gnani STT failed: {result}")
+            return jsonify({"error": "Transcription failed at provider", "details": str(result.get("error"))}), 500
+            
+        transcript = result.get("transcript", "")
+        request_id = result.get("request_id")
+        logger.info(f"Gnani STT success: request_id={request_id}")
+        
+        return jsonify({
+            "success": True,
+            "transcript": transcript,
+            "request_id": request_id
+        })
+        
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Error in voice transcription: {e}")
+        return jsonify({"error": "Internal server error during transcription"}), 500
+
+@app.route("/api/voice/synthesize", methods=["POST"])
+def voice_synthesize():
+    try:
+        from services.gnani_service import synthesize_speech
+        from flask import Response
+        
+        data = request.json or {}
+        text = data.get("text", "")
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+            
+        audio_bytes = synthesize_speech(text)
+        return Response(audio_bytes, mimetype="audio/wav")
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)

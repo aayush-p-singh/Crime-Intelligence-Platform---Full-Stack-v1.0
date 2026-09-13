@@ -17,7 +17,10 @@ import {
   ShieldCheck,
   FileText,
   Search as SearchIcon,
-  Database
+  Database,
+  Mic,
+  Volume2,
+  Square
 } from "lucide-react";
 
 // --- Types ---
@@ -163,6 +166,79 @@ const renderFormattedContent = (content: any) => {
   return <>{elements}</>;
 };
 
+function ReadAssessmentButton({ text }: { text: string }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleTogglePlay = async () => {
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.play();
+      setIsPlaying(true);
+      return;
+    }
+
+    // Synthesize new audio
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const audioBlob = await api.synthesizeAudio(text);
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      
+      audio.onended = () => {
+        setIsPlaying(false);
+      };
+      
+      audioRef.current = audio;
+      await audio.play();
+      setIsPlaying(true);
+    } catch (err: any) {
+      console.error("TTS Error:", err);
+      setError("Failed to generate audio.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={handleTogglePlay}
+        disabled={isLoading}
+        className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-[#7c3aed] bg-[#7c3aed]/10 hover:bg-[#7c3aed]/20 rounded-lg transition-colors"
+      >
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : isPlaying ? (
+          <Square className="h-4 w-4 fill-current" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
+        {isLoading ? "Synthesizing..." : isPlaying ? "Stop Assessment" : "Read Assessment"}
+      </button>
+      {error && <span className="text-xs text-red-500">{error}</span>}
+    </div>
+  );
+}
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
@@ -217,6 +293,12 @@ function MessageBubble({ message }: { message: ChatMessage }) {
               {!message.isError && (
                 <div className="text-[15px]">
                   {renderFormattedContent(message.content)}
+                </div>
+              )}
+              
+              {!message.isError && (
+                <div className="mt-4 pt-4 border-t border-black/[0.04]">
+                   <ReadAssessmentButton text={message.content} />
                 </div>
               )}
             </div>
@@ -293,6 +375,13 @@ function CIOComponent() {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Voice State
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<BlobPart[]>([]);
+
   // Auto-scroll to bottom on new message
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -301,6 +390,65 @@ function CIOComponent() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleStartRecording = async () => {
+    setMicError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        // Stop all tracks to release mic
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Send to transcription
+        try {
+          setIsTranscribing(true);
+          const data = await api.transcribeAudio(audioBlob);
+          if (data.transcript) {
+            setInput((prev) => prev + (prev ? " " : "") + data.transcript);
+          } else {
+            setMicError("No speech detected.");
+          }
+        } catch (err) {
+          console.error(err);
+          setMicError("Transcription failed.");
+        } finally {
+          setIsTranscribing(false);
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error(err);
+      setMicError("Microphone permission denied.");
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleToggleRecording = () => {
+    if (isRecording) {
+      handleStopRecording();
+    } else {
+      handleStartRecording();
+    }
+  };
 
   // Mutation for sending messages to Flask -> Sarvam API
   const chatMutation = useMutation({
@@ -420,15 +568,41 @@ function CIOComponent() {
 
           {/* Input Area */}
           <div className="p-4 bg-[#f8f9fa] border-t border-black/[0.06]">
+            {micError && (
+              <div className="mb-2 px-3 py-1.5 bg-red-50 text-red-600 text-xs rounded-lg inline-block border border-red-100">
+                <AlertCircle className="h-3 w-3 inline mr-1" />
+                {micError}
+              </div>
+            )}
             <div className="relative flex items-center shadow-sm rounded-xl bg-white border border-black/[0.08] focus-within:border-[#111] focus-within:ring-2 focus-within:ring-[#111]/20 transition-all">
+              <button
+                onClick={handleToggleRecording}
+                disabled={isTranscribing || chatMutation.isPending}
+                className={`absolute left-2 p-2 rounded-lg transition-colors shadow-sm z-10 ${
+                  isRecording
+                    ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
+                    : isTranscribing
+                    ? "bg-gray-100 text-gray-400"
+                    : "bg-[#f4f4f5] hover:bg-[#e4e4e7] text-[#444]"
+                }`}
+                title="Voice Input"
+              >
+                {isTranscribing ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isRecording ? (
+                  <Square className="h-5 w-5 fill-current" />
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )}
+              </button>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Query the intelligence network..."
-                disabled={chatMutation.isPending}
-                className="w-full bg-transparent py-4 pl-4 pr-14 text-sm text-[#111] outline-none placeholder:text-[#888] disabled:opacity-50"
+                placeholder={isRecording ? "Listening..." : isTranscribing ? "Transcribing..." : "Query the intelligence network..."}
+                disabled={chatMutation.isPending || isRecording || isTranscribing}
+                className="w-full bg-transparent py-4 pl-14 pr-14 text-sm text-[#111] outline-none placeholder:text-[#888] disabled:opacity-50"
               />
               <button
                 onClick={() => handleSend()}

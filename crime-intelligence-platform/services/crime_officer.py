@@ -10,7 +10,7 @@ from sarvamai import SarvamAI
 from graph.neo4j_connection import Neo4jConnection
 from services.crime_tools import CrimeTools
 from services.ai.intent_router import router
-from services.retrieval.prompt_builder import LIVE_INTELLIGENCE_PROMPT, build_live_prompt
+from services.retrieval.prompt_builder import LIVE_INTELLIGENCE_PROMPT, COMPACT_LIVE_INTELLIGENCE_PROMPT, build_live_prompt
 from services.retrieval.retrieval_service import RetrievalService
 import os
 
@@ -192,7 +192,7 @@ Write like a professional intelligence officer briefing a senior official.
     dataset,
     indent=2
 )       
-    def ask_llm(self, message, system_prompt=SYSTEM_PROMPT):
+    def ask_llm(self, message, system_prompt=SYSTEM_PROMPT, fallback_system_prompt=None):
 
         messages = [
         {
@@ -212,20 +212,46 @@ Write like a professional intelligence officer briefing a senior official.
             response = client.chat.completions(
                 model="sarvam-105b",
                 messages=messages,
-                max_tokens=4096
+                max_tokens=4096,
+                reasoning_effort="low"
             )
             
             if not getattr(response, "choices", None):
                 logger.error("LLM returned empty choices or invalid response.")
-                reply = "I apologize, but I could not synthesize the intelligence at this moment."
+                return "I apologize, but I could not synthesize the intelligence at this moment."
+            
+            choice = response.choices[0]
+            content = choice.message.content
+            finish_reason = getattr(choice, 'finish_reason', 'unknown')
+            usage = getattr(response, 'usage', None)
+            prompt_tokens = getattr(usage, 'prompt_tokens', -1) if usage else -1
+            completion_tokens = getattr(usage, 'completion_tokens', -1) if usage else -1
+            
+            logger.info(f"SARVAM DIAGNOSTICS - finish_reason: {finish_reason}, prompt_tokens: {prompt_tokens}, completion_tokens: {completion_tokens}, content is None: {content is None}")
+            
+            if (not content or finish_reason == 'length') and fallback_system_prompt:
+                logger.info("Executing ONE controlled retry with compact prompt due to length exhaustion.")
+                messages[0]["content"] = fallback_system_prompt
+                retry_response = client.chat.completions(
+                    model="sarvam-105b",
+                    messages=messages,
+                    max_tokens=4096,
+                    reasoning_effort="low"
+                )
+                if getattr(retry_response, "choices", None):
+                    retry_choice = retry_response.choices[0]
+                    retry_content = retry_choice.message.content
+                    retry_finish = getattr(retry_choice, 'finish_reason', 'unknown')
+                    retry_usage = getattr(retry_response, 'usage', None)
+                    logger.info(f"SARVAM RETRY DIAGNOSTICS - finish_reason: {retry_finish}, prompt_tokens: {getattr(retry_usage, 'prompt_tokens', -1)}, completion_tokens: {getattr(retry_usage, 'completion_tokens', -1)}")
+                    if retry_content:
+                        return retry_content
+            
+            if not content:
+                reply = "I apologize, but the intelligence synthesis failed or exceeded length."
             else:
-                content = response.choices[0].message.content
-                finish_reason = getattr(response.choices[0], 'finish_reason', 'unknown')
-                logger.info(f"LLM finish_reason: {finish_reason}")
-                if not content:
-                    reply = "I apologize, but the intelligence synthesis failed or exceeded length."
-                else:
-                    reply = content
+                reply = content
+                
         except Exception as e:
             logger.error(f"Error calling LLM: {e}")
             reply = "I apologize, but the intelligence service is temporarily unavailable."
@@ -275,7 +301,7 @@ Write like a professional intelligence officer briefing a senior official.
                 len(retrieval.source_records),
                 len(enriched_prompt),
             )
-            reply = self.ask_llm(enriched_prompt, LIVE_INTELLIGENCE_PROMPT)
+            reply = self.ask_llm(enriched_prompt, LIVE_INTELLIGENCE_PROMPT, COMPACT_LIVE_INTELLIGENCE_PROMPT)
 
             logger.info("=" * 80)
             logger.info("SARVAM RAW RESPONSE:")

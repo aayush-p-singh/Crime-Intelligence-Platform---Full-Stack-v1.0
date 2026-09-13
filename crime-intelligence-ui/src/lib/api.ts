@@ -1,5 +1,5 @@
 // API Base Configuration
-const API_BASE_URL = "https://crime-intelligence.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // --- Type Definitions ---
 
@@ -251,4 +251,38 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  // Voice APIs
+  transcribeAudio: async (audioBlob: Blob) => {
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "audio.webm");
+    
+    // We can't use apiFetch easily because it sets Content-Type to application/json
+    const response = await fetch(`${API_BASE_URL}/api/voice/transcribe`, {
+      method: "POST",
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Voice Transcribe API Error: ${response.status}`);
+    }
+    
+    return await response.json();
+  },
+  
+  synthesizeAudio: async (text: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/voice/synthesize`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Voice Synthesize API Error: ${response.status}`);
+    }
+    
+    return await response.blob();
+  },
 };
