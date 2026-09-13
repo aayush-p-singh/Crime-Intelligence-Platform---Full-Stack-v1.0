@@ -7,5 +7,5 @@ gunicorn
 pandas
 neo4j
 dotenv
-sarvamaiav
+sarvamai
 requests
